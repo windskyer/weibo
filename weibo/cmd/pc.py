@@ -11,12 +11,12 @@ import sys
 
 import weibo
 from weibo import simu
-import pdb;pdb.set_trace()
 from weibo.common import cfg
 from weibo.common import log
 
 
 CONF = cfg.CONF
+
 
 def set_env():
     possible_topdir = os.path.normpath(os.path.join(os.path.abspath(__file__),
@@ -31,7 +31,6 @@ def set_env():
     dev_conf = os.path.join(possible_topdir,
                             'etc',
                             'weibo.conf')
-    import pdb;pdb.set_trace()
     if os.path.exists(dev_conf):
         CONF(dev_conf)
     else:
@@ -55,7 +54,6 @@ def login():
 
     # 模拟登陆的功能扩展待完善
     simulogin = simu.Simu()
-
 
     print(simulogin.detail())
     # print(simu.detail('http://weibo.com/kaifulee'))
