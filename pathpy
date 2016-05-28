@@ -1,0 +1,1 @@
+export PYTHONPATH="$PYTHONPATH:/home/love/github/github/weibo"

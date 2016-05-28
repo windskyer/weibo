@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # coding: utf-8
 # Copyright (c) 2013
 #
@@ -227,7 +227,7 @@ class weibo_login(object):
         @param cookie_file: file name where to save cookies when login succeeded
         """
         # POST data per LOGIN WEIBO, these fields can be captured using httpfox extension in FIrefox
-        #import pdb;pdb.set_trace()
+        import pdb;pdb.set_trace()
         login_data = {
             'entry': 'weibo',
             'gateway': '1',
@@ -342,12 +342,12 @@ class weibo_login(object):
 
 
     def get_user(self, username):
-        #import pdb;pdb.set_trace()
+        import pdb;pdb.set_trace()
         username_ = urllib2.quote(username)
         if six.PY3:
             username = base64.encodestring(username_.encode())[:-1].decode('utf-8')
         if six.PY2:
-            username = base64.encodestring(username)[:-1]
+            username = base64.encodestring(username_)[:-1]
 
         return username
 
@@ -485,10 +485,8 @@ def dataToUser(data):
 
 
 def jiexi(content):
-    #import pdb;pdb.set_trace()
-    #if six.PY2:
-        #    content = content.encode('gbk')
-    content = content.decode('utf-8')
+    if six.PY3:
+        content = content.decode('utf-8')
     tmp = re.findall(r'pl\.content\.homeFeed\.index.*html\":\"(.*)\"}\)', content)
     # for tmp_r in tmp:
     # content = content.replace(tmp_r, 's')
@@ -497,7 +495,9 @@ def jiexi(content):
         if max < len(i):
             max = len(i)
             content = i
+
     content = content.replace('WB_detail', 'WB_detailWB_detail')
+
     # get all things
     WB_single = re.findall(r"WB\_detail(.+?)WB\_detail", content)
     # for i in range(0,len(WB_single)):
@@ -516,7 +516,6 @@ def jiexi(content):
     #  'link': u['user']['id']
     # })
     user = []
-    #print(content)
     for WB in WB_single:
         # 正文
         #import pdb;pdb.set_trace()
@@ -571,6 +570,7 @@ def jiexi(content):
             'link': WB_uid,
             'like': WB_like,
         })
+
     return user, len(user)
 
 def getImg(url, mid):
@@ -585,7 +585,8 @@ if __name__ == '__main__':
     # pwd = config.get('simu', 'pwd')
     # html = weibo_login(username, pwd)
     # print(html.getHTML('http://www.weibo.com/kaifulee'))
-    #import pdb;pdb.set_trace()
+    import pdb
+    pdb.set_trace()
     aa = simu()
     aa.pre_weibo_login
     #print(aa.detail('http://weibo.com/kaifulee'))

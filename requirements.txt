@@ -1,2 +1,4 @@
 requests
 six
+rsa
+pbr>=1.8
