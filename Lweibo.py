@@ -5,6 +5,7 @@
 
 __author__ = 'zwei'
 
+import io
 import os
 import sys
 import re
@@ -406,8 +407,8 @@ class useAPI(object):
         client = Client(self.APP_KEY, self.APP_SECRET, self.CALLBACK_URL)
         return client.authorize_url
 
-    def get(self, url, **kwargs):
-        kwargs['count'] = 1000
+    def get(self, url, count=1000, **kwargs):
+        kwargs['count'] = count
         if self.checked == False:
             self.token()
         return self.api.get(url, **kwargs)
@@ -586,9 +587,31 @@ if __name__ == '__main__':
     # html = weibo_login(username, pwd)
     # print(html.getHTML('http://www.weibo.com/kaifulee'))
     import pdb
-    pdb.set_trace()
-    aa = simu()
-    aa.pre_weibo_login
+    #pdb.set_trace()
+    #aa = simu()
+    #aa.pre_weibo_login
     #print(aa.detail('http://weibo.com/kaifulee'))
-    wburl = "http://weibo.com/p/1005053538755522/home?is_all=1&stat_date=201312#feedtop"
-    print(aa.detail(wburl))
+    #wburl = "http://weibo.com/p/1005053538755522/home?is_all=1&stat_date=201312#feedtop"
+    #print(aa.detail(wburl))
+
+    # API 参考 http://open.weibo.com/wiki/%E5%BE%AE%E5%8D%9AAPI
+    # 使用参考 https://github.com/lxyu/weibo
+    api = useAPI()
+    print(api.get('account/get_uid'))
+    #print(api.get('statuses/friends_timeline/ids', 200, trim_user=1))
+    print(api.get('comments/show', 2,id=3979643894008861))
+    #print(api.get('statuses/user_timeline/ids', uid=3538755522))
+    #print(api.get('statuses/queryid', mid="1035051413304027"))
+    #ujson = api.get('statuses/show_batch', ids="3538755522")
+    #ujson = api.get('users/show', screen_name="海涛法师")
+    #ujson = api.get('statuses/querymid', id=3538755522, type=2, is_batch=1)
+    #print(ujson)
+#ujson = api.get('users/counts', uids=1337970873)#    print(ujson)
+    #jjson = json.JSONEncoder().encode(ujson)
+    #print(jjson)
+    #with open('/tmp/a.tmp', 'wb') as fp:
+        #    fp.write(ujson)
+
+    # print(api.post('statuses/update', status='test from my api'))
+
+

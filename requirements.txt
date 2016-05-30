@@ -1,4 +1,9 @@
 requests
-six
-rsa
+six<=1.9.0
+rsa<=3.4.2
 pbr>=1.8
+SQLAlchemy<=1.0.11
+sqlalchemy-migrate<=0.10.0
+PyMySQL<=0.6.7
+MySQL-python<=1.2.3
+iso8601<=0.1.11
