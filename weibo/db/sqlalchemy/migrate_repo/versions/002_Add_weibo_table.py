@@ -10,12 +10,14 @@ def _create_weibo_table(migrate_engine, drop=False):
 
     # create weibo tables
     weibo = Table('weibo', meta,
-                  Column('created_at', DateTime),
-                  Column('updated_at', DateTime),
-                  Column('deleted_at', DateTime),
+                  Column('created_time', DateTime),
+                  Column('updated_time', DateTime),
+                  Column('deleted_time', DateTime),
                   Column('deleted', Boolean),
 
-                  Column('id', Integer, primary_key=True, nullable=False),
+                  # 主建
+                  Column('id', BigInteger, primary_key=True, nullable=False),
+
                   # 微博id
                   Column('mid', BigInteger, nullable=False),
 
@@ -26,10 +28,10 @@ def _create_weibo_table(migrate_engine, drop=False):
                   Column('text', Text, nullable=False),
 
                   # img 图片url 信息
-                  Column('img', VARCHAR(64), nullable=False),
+                  Column('img', VARCHAR(250), nullable=False),
 
                   # videos 视频 url 信息
-                  Column('videos', VARCHAR(64), nullable=False),
+                  Column('videos', VARCHAR(250), nullable=False),
 
                   # 转发数量
                   Column('forward', BigInteger, nullable=False),
@@ -41,7 +43,7 @@ def _create_weibo_table(migrate_engine, drop=False):
                   Column('praised', BigInteger, nullable=False),
 
                   # 发布时间
-                  Column('time_at', VARCHAR(15), nullable=True),
+                  Column('time_at', VARCHAR(150), nullable=True),
 
                   extend_existing=True,
                   mysql_engine='InnoDB',

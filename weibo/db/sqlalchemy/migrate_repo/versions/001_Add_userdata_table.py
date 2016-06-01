@@ -10,11 +10,12 @@ def _create_userdata_table(migrate_engine, drop=False):
 
     # create userdata tables
     userdata = Table('userdata', meta,
-                     Column('created_at', DateTime),
-                     Column('updated_at', DateTime),
-                     Column('deleted_at', DateTime),
+                     Column('created_time', DateTime),
+                     Column('updated_time', DateTime),
+                     Column('deleted_time', DateTime),
                      Column('deleted', Boolean),
 
+                     # 主建
                      Column('id', BigInteger, primary_key=True, nullable=False),
 
                      # 用户UID
@@ -24,10 +25,10 @@ def _create_userdata_table(migrate_engine, drop=False):
                      Column('screen_name', VARCHAR(64), nullable=False),
 
                      # 友好名称
-                     Column('name', VARCHAR(32), nullable=False),
+                     Column('name', VARCHAR(32), nullable=True),
 
                      # 用户所在地方
-                     Column('location', VARCHAR(64), nullable=False),
+                     Column('location', VARCHAR(64), nullable=True),
 
                      # 简介
                      Column('description', VARCHAR(200), nullable=True),
@@ -51,7 +52,10 @@ def _create_userdata_table(migrate_engine, drop=False):
                      Column('credit_score', Integer, nullable=True),
 
                      # 注册时间
-                     Column('create_date', VARCHAR(15), nullable=True),
+                     Column('created_at', String(150), nullable=True),
+
+                     # homepage 主页
+                     Column('homepage', String(150), nullable=True),
 
                      extend_existing=True,
                      mysql_engine='InnoDB',

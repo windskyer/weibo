@@ -486,6 +486,7 @@ def dataToUser(data):
 
 
 def jiexi(content):
+    import pdb;pdb.set_trace()
     if six.PY3:
         content = content.decode('utf-8')
     tmp = re.findall(r'pl\.content\.homeFeed\.index.*html\":\"(.*)\"}\)', content)
@@ -577,6 +578,34 @@ def jiexi(content):
 def getImg(url, mid):
     pass
 
+mids = []
+maxcount = 4
+def get_all_mid(api, max_id=0, count=100, page=0, base_app=0, feature=0):
+    global mids
+    global maxcount
+    import pdb;pdb.set_trace()
+    morepage = api.get('statuses/friends_timeline/ids', 100, page=1)
+    next_cursor = morepage.get('next_cursor')
+    mids.extend(morepage.get('statuses'))
+    maxcount = maxcount - 1
+
+    if not int(next_cursor) or not maxcount:
+        mids = list(set(mids))
+    else:
+        get_all_mid(api, int(next_cursor))
+
+    return 0
+
+
+def get_one_mid(api, id, page=0, base_app=0, feature=0):
+    import pdb;pdb.set_trace()
+    morepage = api.get('statuses/friends_timeline',
+                       2,
+                       since_id=0,
+                       max_id=id,
+                       page=1)
+    print morepage.get('statuses')
+
 if __name__ == '__main__':
     # api = useAPI()
     # print(api.get('statuses/user_timeline'))
@@ -588,30 +617,32 @@ if __name__ == '__main__':
     # print(html.getHTML('http://www.weibo.com/kaifulee'))
     import pdb
     #pdb.set_trace()
-    #aa = simu()
-    #aa.pre_weibo_login
-    #print(aa.detail('http://weibo.com/kaifulee'))
-    #wburl = "http://weibo.com/p/1005053538755522/home?is_all=1&stat_date=201312#feedtop"
+    aa = simu()
+    aa.pre_weibo_login
+    print(aa.detail('http://weibo.com/kaifulee'))
+    #wburl = "http://weibo.com/u/3538755522?is_all=1#1464674122618"
     #print(aa.detail(wburl))
 
     # API 参考 http://open.weibo.com/wiki/%E5%BE%AE%E5%8D%9AAPI
     # 使用参考 https://github.com/lxyu/weibo
-    api = useAPI()
-    print(api.get('account/get_uid'))
-    #print(api.get('statuses/friends_timeline/ids', 200, trim_user=1))
-    print(api.get('comments/show', 2,id=3979643894008861))
+    #api = useAPI()
+    #print(api.get('statuses/user_timeline', 200, uid=3538755522))
+    #print(api.get('account/get_uid'))
+    #print(get_all_mid(api))
+    #print mids
+    #get_one_mid(api, 3979151650306475)
+
+    #morepage = api.get('statuses/friends_timeline/ids', 100, page=1, max_id=3976020019056463)
+    #print(morepage.get('next_cursor'))
+    #print(morepage.get('statuses'))
+    #print(api.get('comments/show', 2,id=3981153851194444))
     #print(api.get('statuses/user_timeline/ids', uid=3538755522))
     #print(api.get('statuses/queryid', mid="1035051413304027"))
     #ujson = api.get('statuses/show_batch', ids="3538755522")
     #ujson = api.get('users/show', screen_name="海涛法师")
+    #print ujson.get('profile_url')
+    #ujson = api.get('users/show', screen_name="张爱玲文记")
     #ujson = api.get('statuses/querymid', id=3538755522, type=2, is_batch=1)
     #print(ujson)
-#ujson = api.get('users/counts', uids=1337970873)#    print(ujson)
-    #jjson = json.JSONEncoder().encode(ujson)
-    #print(jjson)
-    #with open('/tmp/a.tmp', 'wb') as fp:
-        #    fp.write(ujson)
-
+    #ujson = api.get('users/counts', uids=1337970873)#    print(ujson)
     # print(api.post('statuses/update', status='test from my api'))
-
-

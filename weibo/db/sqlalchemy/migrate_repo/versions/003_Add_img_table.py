@@ -9,16 +9,18 @@ def _create_img_table(migrate_engine, drop=False):
 
     # create img tables
     img = Table('img', meta,
-                Column('created_at', DateTime),
-                Column('updated_at', DateTime),
-                Column('deleted_at', DateTime),
+                Column('created_time', DateTime),
+                Column('updated_time', DateTime),
+                Column('deleted_time', DateTime),
                 Column('deleted', Boolean),
 
-                Column('id', Integer, primary_key=True, nullable=False),
+                # 主建
+                Column('id', BigInteger, primary_key=True, nullable=False),
+
                 # 微博mid
                 Column('mid', BigInteger, nullable=False),
 
-                # 用户UID
+                # 用户 id
                 Column('uid', BigInteger, nullable=False),
 
                 # img所在地方

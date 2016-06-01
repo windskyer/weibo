@@ -112,7 +112,7 @@ def get_engine():
                                         synchronous_switch_listener)
             sqlalchemy.event.listen(_ENGINE, 'connect', add_regexp_listener)
 
-        if (FLAGS.sql_connection_trace and
+        if (FLAGS.sql_connection_trace == 'True' and
                 _ENGINE.dialect.dbapi.__name__ == 'MySQLdb'):
             import MySQLdb.cursors
             _do_query = debug_mysql_do_query()

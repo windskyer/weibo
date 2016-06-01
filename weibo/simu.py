@@ -5,6 +5,7 @@ import os
 # import eventlet
 
 from weibo.login import Login
+from weibo.jhtml import Jhtml
 from weibo.common import cfg
 from weibo.common import log
 
@@ -31,6 +32,7 @@ class Simu(object):
         self.get_urls
         self.get_nicknames
         self.login = Login(self.username, self.password)
+        self.jhtml = Jhtml()
 
     @property
     def get_urls_name(self):
@@ -75,8 +77,13 @@ class Simu(object):
     def pre_weibo_login(cls):
         cls.login = Login(cls.username, cls.password)
 
-    def get_html(self, url):
-        return self.login.getHTML(url)
+    def get_content(self, url):
+        content = self.login.getHTML(url)
+        print content
+        return 
+        self.jhtml(content)
+        print(self.jhtml.weibodata)
+
 
     def detail(self, url=None):
         if not url:
@@ -93,5 +100,4 @@ class Simu(object):
 
     def _detail(self, url=None):
         if url:
-            # return jiexi(self.simu.getHTML(url))
-            return self.get_html(url)
+            return self.get_content(url)

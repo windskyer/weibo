@@ -56,7 +56,7 @@ def login():
     simulogin = simu.Simu()
 
     print(simulogin.detail())
-    # print(simu.detail('http://weibo.com/kaifulee'))
+    #print(simulogin.detail('http://weibo.com/kaifulee'))
 
 
 def pweibo():

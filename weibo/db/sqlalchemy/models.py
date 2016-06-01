@@ -10,8 +10,10 @@ from sqlalchemy import ForeignKey, DateTime, Boolean, Text, Float
 from sqlalchemy.orm import relationship, backref, object_mapper
 
 
+from weibo.db.sqlalchemy import session
 from weibo.common import timeutils
 
+get_session = session.get_session
 
 BASE = declarative_base()
 
@@ -20,10 +22,10 @@ class WeiboBase(object):
 
     __table_args__ = {'mysql_engine': 'InnoDB'}
     __table_initialized__ = False
-    id = Column(Integer, primary_key=True)
-    created_at = Column(DateTime, default=timeutils.utcnow)
-    updated_at = Column(DateTime, onupdate=timeutils.utcnow)
-    deleted_at = Column(DateTime)
+    id = Column(BigInteger, primary_key=True, nullable=False)
+    created_time = Column(DateTime, default=timeutils.utcnow)
+    updated_time = Column(DateTime, onupdate=timeutils.utcnow)
+    deleted_time = Column(DateTime)
     deleted = Column(Boolean, default=False)
     metadata = None
 
@@ -45,7 +47,7 @@ class WeiboBase(object):
     def delete(self, session=None):
         """Delete this object."""
         self.deleted = True
-        self.deleted_at = timeutils.utcnow()
+        self.deleted_time = timeutils.utcnow()
         self.save(session=session)
 
     def __setitem__(self, key, value):
@@ -115,35 +117,36 @@ class Userdata(BASE, WeiboBase):
     ability_tags =  Column(String(15))
 
     # 性别
-    gender = Column(String(15))
+    gender = Column(String(15), default='m')
 
     # 等级
-    urank = Column(Integer)
+    urank = Column(Integer, default=0)
 
     # 阳光信用
-    credit_score = Column(Integer)
+    credit_score = Column(Integer, default=0)
 
     # 注册时间
-    create_date = Column(String(150))
+    created_at = Column(String(150))
 
-    # 记录删除时间
+    # 主页地址
+    profile_url = Column(String(150))
 
 class Weibo(BASE, WeiboBase):
     __tablename__ = 'weibo'
     # 微博id
-    mid = Column(BigInteger)
+    mid = Column(BigInteger, nullable=False)
 
     # user id
-    uid = Column(BigInteger)
+    uid = Column(BigInteger, nullable=False)
 
     # text 文本信息
     text = Column(Text)
 
     # img 图片url 信息
-    img = Column(String(64))
+    img = Column(String(250))
 
     # videos 视频 url 信息
-    videos = Column(String(64))
+    videos = Column(String(250))
 
     # 转发数量
     forward = Column(BigInteger)
