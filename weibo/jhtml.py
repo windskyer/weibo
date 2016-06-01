@@ -29,7 +29,7 @@ class Soup(object):
         self.soup = HBeautifulSoup(wb, self.parser_type)
 
     def __getattr__(self, key):
-        if not self.soup:
+        if self.soup:
             return getattr(self.soup, key)
         return getattr(self, key)
 
@@ -52,9 +52,9 @@ class JDetail(object):
 
     def __call__(self, WB, **kwargs):
         self.wb = self._get_wb_html(WB)
-        self.jx(wb)
+        self.jx(self.wb)
 
-    def _get_wb_html(self, WB):
+    def _get_wb_html(self, WB, content=None):
         if content is None:
             content = self.content
 
@@ -90,13 +90,38 @@ class JDetail(object):
         text_div = text_divs[0]
         return text_div
 
+    def _get_wb_children(self, div):
+        pass
+
+    def _resolve_text(self, text):
+        if not isinstance(text, six.text_type):
+            text = unicode(text, 'utf-8')
+        return text.strip()
+
+    def _get_wb_no_children(self, div):
+        text = div.text
+        text = self._resolve_text(text)
+        print(text)
+        return text
+
     def get_wb_text(self):
         import pdb;pdb.set_trace()
         text_div = self._get_wb_text(zf=False)
+        if len(list(text_div.children)) > 1:
+            self._get_wb_children(text_div)
+        else:
+            self._get_wb_no_children(text_div)
 
 
     def _get_wb_img(self):
-        pass
+        div_attrs = {'node-type': 'feed_list_media_prev'}
+        img_divs = self.jx.findAll(name='div', attrs=div_attrs)
+        if len(img_divs) != 1:
+            raise exception.NotFounddivtexttag()
+        img_div = img_divs[0]
+
+    def get_wb_img(self):
+        import pdb;pdb.set_trace()
 
 class Jhtml(object):
     '''
@@ -109,6 +134,7 @@ class Jhtml(object):
 
     def __call__(self, content):
         self.jiexi2(content)
+        self.jdetail = JDetail()
 
     def tmp_file(self, content):
         tmp = re.findall(r'pl\.content\.homeFeed\.index.*html\":\"(.*)\"}\)', content)
@@ -131,16 +157,18 @@ class Jhtml(object):
 
     def wb_text(self, WB):
         # 正文
-        jdetail = JDetail()
-        jdetail(WB)
-        WB_text = ''.join(re.findall(r"WB\_text[^>]*>(.*?)<\\/div", WB)).replace('\\n', '').replace('\\"', '"').replace('\\/', '/').strip()
-        return WB_text
+        self.jdetail(WB)
+        self.jdetail.get_wb_text()
+        #WB_text = ''.join(re.findall(r"WB\_text[^>]*>(.*?)<\\/div", WB)).replace('\\n', '').replace('\\"', '"').replace('\\/', '/').strip()
+        #return WB_text
 
     def wb_img(self, WB):
         # 图片
-        reg = r'src="(.*?\.jpg)"'
-        WB_img = ''.join(re.findall(r'src=.*.sinaimg.cn.*.jpg', WB))
-        return WB_img
+        #reg = r'src="(.*?\.jpg)"'
+        #WB_img = ''.join(re.findall(r'src=.*.sinaimg.cn.*.jpg', WB))
+        #return WB_img
+        self.jdetail(WB)
+        self.jdetail.get_wb_text()
 
     def wb_videos(self, WB):
         # 视频
