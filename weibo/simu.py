@@ -79,9 +79,7 @@ class Simu(object):
 
     def get_content(self, url):
         content = self.login.getHTML(url)
-        import pdb;pdb.set_trace()
-        self.jhtml.jiexi2(content)
-        print(self.jhtml.weibodata)
+        self.jhtml(content)
 
 
     def detail(self, url=None):

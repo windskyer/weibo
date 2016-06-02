@@ -75,3 +75,6 @@ class UserdataIdNotFound(WeiboError):
 
 class UserdataNameNotFound(WeiboError):
     msg_fmt = ("Userdata  name %(name)s not found exists.")
+
+class NotFoundChildrenTag(WeiboError):
+    msg_fmt = ("Not Found %(name)s attrs %(atrrs)s children tag ")
