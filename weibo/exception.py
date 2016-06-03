@@ -64,17 +64,23 @@ class ConfigFileParseError(Error):
     def __str__(self):
         return 'Failed to parse %s: %s' % (self.config_file, self.msg)
 
+
 class UserdataNameExists(WeiboError):
     msg_fmt = ("Userdata '%(userdata_name)s' user already exists.")
+
 
 class UserdataUidNotFound(WeiboError):
     msg_fmt = ("Userdata uid %(uid)s not found exists.")
 
+
 class UserdataIdNotFound(WeiboError):
     msg_fmt = ("Userdata id %(id)s not found exists.")
+
 
 class UserdataNameNotFound(WeiboError):
     msg_fmt = ("Userdata  name %(name)s not found exists.")
 
+
 class NotFoundChildrenTag(WeiboError):
-    msg_fmt = ("Not Found %(name)s attrs %(atrrs)s children tag ")
+    msg_fmt = ("Not Found %(name)s attrs %(class)s, "
+               "%(nova-type)s children tag ")

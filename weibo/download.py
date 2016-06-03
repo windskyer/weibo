@@ -14,8 +14,10 @@ from weibo.common import log
 class Download(object):
     pass
 
+
 class ImageDl(Download):
     pass
+
 
 class VideosDl(Download):
     pass

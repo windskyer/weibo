@@ -12,6 +12,10 @@ from weibo.common import log
 CONF = cfg.CONF
 
 
+class Save(object):
+    pass
+
+
 class Simu(object):
     """ frist login weibo """
     username = "unkown"
@@ -80,7 +84,6 @@ class Simu(object):
     def get_content(self, url):
         content = self.login.getHTML(url)
         self.jhtml(content)
-
 
     def detail(self, url=None):
         if not url:
