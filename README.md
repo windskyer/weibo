@@ -36,3 +36,24 @@ url3 = http://weibo.com/jiqun
 #python3 run.py
 ```
 
+database
+====
+```
+1, 设置 配置文件中的sql 地址
+[database]
+sql_connection = mysql://weibo:weibo@192.168.122.206/weibo?charset=utf8
+
+2, 在mysql数据库 中的 创建 weibo 数据库
+create database weibo;
+
+3, 通不数据库表格
+bin/weibo_db
+```
+
+获取数据
+====
+```
+1, 执行获取命令
+bin/weibo_pc
+
+```

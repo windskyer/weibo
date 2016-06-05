@@ -204,7 +204,7 @@ def weibo_get_by_id(id, session=None):
                      filter_by(id=id).\
                      first()
     if not result:
-        raise exception.UserdataMidNotFound(mid=mid)
+        raise exception.WeiboIdNotFound(mid=mid)
 
     return result
 
@@ -214,7 +214,7 @@ def weibo_get_by_mid(mid, session=None):
                      filter_by(mid=mid).\
                      first()
     if not result:
-        raise exception.UserdataMidNotFound(mid=mid)
+        raise exception.WeiboMidNotFound(mid=mid)
 
     return result
 
@@ -224,7 +224,7 @@ def weibo_get_by_uid(uid, session=None):
                      filter_by(uid=uid).\
                      all()
     if not result:
-        raise exception.UserdataMidNotFound(mid=mid)
+        raise exception.WeiboUidNotFound(uid=uid)
 
     return result
 
@@ -232,6 +232,195 @@ def weibo_get_by_uid(uid, session=None):
 def weibo_get_all(session=None):
     result = model_query(models.Weibo, session=session).\
                      all()
+    return result
+
+
+# wbtext table options
+def wbtext_create(values, session=None):
+    if not session:
+        session = get_session()
+
+    wbtext = _get_query(models.Wbtext,
+                       models.Wbtext.mid,
+                       values['mid'],
+                       session=session,
+                       read_deleted='no').first()
+
+    if not wbtext:
+        wbtext = models.Wbtext()
+        wbtext.update(values)
+        wbtext.save(session=session)
+    else:
+        raise exception.WbtextMidExists(mid=mid)
+
+    return wbtext_get_by_mid(wbtext.mid)
+
+
+def wbtext_update(values, session=None):
+    if not session:
+        session = get_session()
+    mid = values.pop('mid')
+    with session.begin():
+        wbtext = wbtext_get_by_mid(mid, session=session)
+        wbtext.update(values)
+        wbtext.save(session=session)
+
+    return wbtext_get_by_mid(mid)
+
+
+def wbtext_delete(id, session=None):
+    if not session:
+        session = get_session()
+
+    wtext = wbtext_get_by_id(id)
+    if wbtext:
+        wbtext.delete()
+
+
+def wbtext_delete_mid(mid, session=None):
+    if not session:
+        session = get_session()
+
+    wbtext = wbtext_get_by_mid(mid)
+    if wbtext:
+        wbtext.delete()
+
+
+def wbtext_delete_uid(uid, session=None):
+    if not session:
+        session = get_session()
+
+    wbtexts = wbtext_get_by_uid(uid)
+    if wbtext in wbtexts:
+        wbtext.delete()
+
+
+def wbtext_get_by_id(id, session=None):
+    result = model_query(models.Wbtext, session=session).\
+                     filter_by(id=id).\
+                     first()
+    if not result:
+        raise exception.WbtextIdNotFound(id=id)
+
+    return result
+
+
+def wbtext_get_by_mid(mid, session=None):
+    result = model_query(models.Wbtext, session=session).\
+                     filter_by(mid=mid).\
+                     first()
+    if not result:
+        raise exception.WbtextMidNotFound(mid=mid)
+
+    return result
+
+
+def wbtext_get_by_uid(uid, session=None):
+    result = model_query(models.Wbtext, session=session).\
+                     filter_by(uid=uid).\
+                     all()
+    if not result:
+        raise exception.WbtextUidNotFound(uid=uid)
+
+    return result
+
+
+# wbimg table options
+def wbimg_create(values, session=None):
+    if not session:
+        session = get_session()
+
+    url = values['url']
+    wbimg = _get_query(models.Wbimg,
+                       models.Wbimg.url,
+                       url,
+                       session=session,
+                       read_deleted='no').first()
+
+    if not wbimg:
+        wbimg = models.Wbimg()
+        wbimg.update(values)
+        wbimg.save(session=session)
+    else:
+        raise exception.WbimgUrlExists(url=url)
+
+    return wbimg_get_by_url(wbimg.url)
+
+
+def wbimg_update(values, session=None):
+    if not session:
+        session = get_session()
+    url = values.get('url')
+    with session.begin():
+        wbimg = wbimg_get_by_url(url, session=session)
+        wbimg.update(values)
+        wbimg.save(session=session)
+
+    return wbimg_get_by_url(url)
+
+
+def wbimg_delete(id, session=None):
+    if not session:
+        session = get_session()
+
+    wbimg = wbimg_get_by_id(id)
+    if wbimg:
+        wbimg.delete()
+
+
+def wbimg_delete_mid(mid, session=None):
+    if not session:
+        session = get_session()
+
+    wbimg = wbimg_get_by_mid(mid)
+    if wbimg:
+        wbimg.delete()
+
+
+def wbimg_delete_uid(uid, session=None):
+    if not session:
+        session = get_session()
+
+    wbimgs = wbimg_get_by_uid(uid)
+    if wbimg in wbimgs:
+        wbimg.delete()
+
+def wbimg_get_by_url(url, session=None):
+    result = model_query(models.Wbimg, session=session).\
+                     filter_by(url=url).\
+                     first()
+    if not result:
+        raise exception.WbimgUrlNotFound(url=url)
+
+    return result
+
+
+def wbimg_get_by_id(id, session=None):
+    result = model_query(models.Wbimg, session=session).\
+                     filter_by(id=id).\
+                     first()
+    if not result:
+        raise exception.WbimgIdNotFound(id=id)
+
+    return result
+
+
+def wbimg_get_by_mid(mid, session=None):
+    result = model_query(models.Wbimg, session=session).\
+                     filter_by(mid=mid).\
+                     first()
+    if not result:
+        raise exception.WbimgMidNotFound(mid=mid)
+
+    return result
+
+def wbimg_get_by_uid(uid, session=None):
+    result = model_query(models.Wbimg, session=session).\
+                     filter_by(uid=uid).\
+                     all()
+    if not result:
+        raise exception.WbimgUidNotFound(uid=uid)
+
     return result
 
 

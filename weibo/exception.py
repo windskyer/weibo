@@ -64,6 +64,56 @@ class ConfigFileParseError(Error):
     def __str__(self):
         return 'Failed to parse %s: %s' % (self.config_file, self.msg)
 
+# db exception
+class WeiboMidExists(WeiboError):
+    msg_fmt = ("Weibo %(mid)s is exists.")
+
+class WeiboMidNotFound(WeiboError):
+    msg_fmt = ("Weibo %(mid)s could not be found.")
+
+class WeiboIdNotFound(WeiboError):
+    msg_fmt = ("Weibo %(id)s could not be found.")
+
+class WeiboUidNotFound(WeiboError):
+    msg_fmt = ("Weibo %(uid)s could not be found.")
+
+
+class WbtextMidExists(WeiboError):
+    msg_fmt = ("Wbtext %(mid)s is exists.")
+
+
+class WbtextMidNotFound(WeiboError):
+    msg_fmt = ("Wbtext %(mid)s could not be found.")
+
+
+class WbtextIdNotFound(WeiboError):
+    msg_fmt = ("Wbtext %(id)s could not be found.")
+
+
+class WbtextUidNotFound(WeiboError):
+    msg_fmt = ("Wbtext %(uid)s could not be found.")
+
+class WbimgUrlNotFound(WeiboError):
+    msg_fmt = ("Wbimg %(url)s could not be found.")
+
+class WbimgUrlExists(WeiboError):
+    msg_fmt = ("Wbimg %(url)s is exists.")
+
+class WbimgMidExists(WeiboError):
+    msg_fmt = ("Wbimg %(mid)s is exists.")
+
+class WbimgMidNotFound(WeiboError):
+    msg_fmt = ("Wbimg %(mid)s could not be found.")
+
+class WbimgIdNotFound(WeiboError):
+    msg_fmt = ("Wbimg %(id)s could not be found.")
+
+class WbimgUidNotFound(WeiboError):
+    msg_fmt = ("Wbimg %(uid)s could not be found.")
+
+
+class UserdataMidNotFound(WeiboError):
+    msg_fmt = ("Userdata mid %(mid)s not found exists.")
 
 class UserdataNameExists(WeiboError):
     msg_fmt = ("Userdata '%(userdata_name)s' user already exists.")
@@ -84,3 +134,4 @@ class UserdataNameNotFound(WeiboError):
 class NotFoundChildrenTag(WeiboError):
     msg_fmt = ("Not Found %(name)s attrs %(class)s, "
                "%(nova-type)s children tag ")
+

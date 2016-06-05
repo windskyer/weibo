@@ -459,6 +459,7 @@ class Jhtml(object):
             wb_info = self.get_wb_info(wb, False)
             if is_zf:
                 zf_wb = self.get_wb_info(wb, True)
+                zf_wb.setdefault('zf_mid', wb_info.get('mid'))
                 wb_info.setdefault('zf_wb', zf_wb)
             self.weibodata.append(wb_info)
 

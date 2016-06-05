@@ -140,13 +140,13 @@ class Weibo(BASE, WeiboBase):
     uid = Column(BigInteger, nullable=False)
 
     # text 文本信息
-    text = Column(Text)
+    # text = Column(Text)
 
     # img 图片url 信息
-    img = Column(String(250))
+    # img = Column(String(250))
 
     # videos 视频 url 信息
-    videos = Column(String(250))
+    # videos = Column(String(250))
 
     # 转发数量
     forward = Column(BigInteger)
@@ -161,8 +161,8 @@ class Weibo(BASE, WeiboBase):
     time_at = Column(String(150))
 
 
-class Img(BASE, WeiboBase):
-    __tablename__ = 'img'
+class Wbimg(BASE, WeiboBase):
+    __tablename__ = 'wbimg'
 
     # 微博mid
     mid = Column(BigInteger, nullable=False)
@@ -171,4 +171,33 @@ class Img(BASE, WeiboBase):
     uid = Column(BigInteger, nullable=False)
 
     # img所在地方
-    location = Column(String(200), nullable=False)
+    location = Column(String(200))
+
+    # img 的 url 地址
+    url = Column(String(200))
+
+    # 是否是转发微博
+    is_zf = Column(Boolean, default=False)
+
+
+class Wbtext(BASE, WeiboBase):
+    __tablename__ = 'wbtext'
+
+    # 微博mid
+    mid = Column(BigInteger, nullable=False)
+
+    # 用户UID
+    uid = Column(BigInteger, nullable=False)
+
+    # text info
+    text = Column(Text)
+
+    # face 表情 info
+    face = Column(Text)
+
+    # 文本中的link 的 url 地址
+    url = Column(Text)
+
+    # 是否是转发微博
+    is_zf = Column(Boolean, default=False)
+

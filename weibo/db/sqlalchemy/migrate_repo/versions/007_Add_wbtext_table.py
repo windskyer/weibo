@@ -1,14 +1,13 @@
 # --*-- coding: utf-8 --*--
-
 from sqlalchemy import *
 from migrate import *
 
-def _create_img_table(migrate_engine, drop=False):
+def _create_wbtext_table(migrate_engine, drop=False):
     meta = MetaData(migrate_engine)
     meta.reflect(migrate_engine)
 
-    # create img tables
-    img = Table('img', meta,
+    # create wbtext tables
+    wbtext = Table('wbtext', meta,
                 Column('created_time', DateTime),
                 Column('updated_time', DateTime),
                 Column('deleted_time', DateTime),
@@ -23,14 +22,23 @@ def _create_img_table(migrate_engine, drop=False):
                 # 用户 id
                 Column('uid', BigInteger, nullable=False),
 
-                # img所在地方
-                Column('location', String(200), nullable=False),
+                # text info
+                Column('text', Text, nullable=True),
+
+                # 是否是转发weibo
+                Column('is_zf', Boolean, default=False),
+
+                # 表情 链接
+                Column('face', Text),
+
+                # http 链接地址
+                Column('url', Text),
 
                 extend_existing=True,
                 mysql_engine='InnoDB',
                 mysql_charset='utf8')
 
-    tables = [img]
+    tables = [wbtext]
     for table in tables:
         if not drop:
             try:
@@ -44,12 +52,13 @@ def _create_img_table(migrate_engine, drop=False):
                 raise
 
 
+
 def upgrade(migrate_engine):
     # Upgrade operations go here. Don't create your own engine; bind
     # migrate_engine to your metadata
-    _create_img_table(migrate_engine, drop=False)
+    _create_wbtext_table(migrate_engine, drop=False)
 
 
 def downgrade(migrate_engine):
     # Operations to reverse the above upgrade go here.
-    _create_img_table(migrate_engine, drop=True)
+    _create_wbtext_table(migrate_engine, drop=True)

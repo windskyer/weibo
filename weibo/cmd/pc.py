@@ -5,37 +5,44 @@
 '''
 Crawler same weibo info
 '''
-
 import os
 import sys
 
+possible_topdir = os.path.normpath(os.path.join(os.path.abspath(__file__),
+                                                os.pardir,
+                                                os.pardir,
+                                                os.pardir))
+if os.path.exists(os.path.join(possible_topdir,
+                               "weibo",
+                               "__init__.py")):
+    sys.path.insert(0, possible_topdir)
+
 import weibo
 from weibo import simu
+from weibo.db import migration
 from weibo.common import cfg
 from weibo.common import log
 
-
 CONF = cfg.CONF
+dev_conf = os.path.join(possible_topdir,
+                        'etc',
+                        'weibo.conf')
+
+if os.path.exists(dev_conf):
+    CONF(dev_conf)
+else:
+    CONF()
+    # LOG = logging.setup(*argv[:-1])
 
 
-def set_env():
-    possible_topdir = os.path.normpath(os.path.join(os.path.abspath(__file__),
-                                                    os.pardir,
-                                                    os.pardir,
-                                                    os.pardir))
-    if os.path.exists(os.path.join(possible_topdir,
-                                   "weibo",
-                                   "__init__.py")):
-        sys.path.insert(0, possible_topdir)
+def db_sync(version=None):
+    """Sync the database up to the most recent version."""
+    return migration.db_sync(version)
 
-    dev_conf = os.path.join(possible_topdir,
-                            'etc',
-                            'weibo.conf')
-    if os.path.exists(dev_conf):
-        CONF(dev_conf)
-    else:
-        CONF()
-        # LOG = logging.setup(*argv[:-1])
+
+def db_version(self):
+    """Print the current database version."""
+    print migration.db_version()
 
 
 def api():
@@ -55,8 +62,9 @@ def login():
     # 模拟登陆的功能扩展待完善
     simulogin = simu.Simu()
 
-    print(simulogin.detail())
-    #print(simulogin.detail('http://weibo.com/kaifulee'))
+    simulogin.detail()
+    simulogin.save_all_data()
+    # print(simulogin.detail('http://weibo.com/kaifulee'))
 
 
 def pweibo():
@@ -64,13 +72,16 @@ def pweibo():
 
 
 def pmain():
-    set_env()
     login()
 
 
 def amain():
     api()
 
+def dbmain():
+    db_sync()
+
 
 if __name__ == '__main__':
-    pmain()
+    dbmain()
+    #pmain()

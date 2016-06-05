@@ -2,4 +2,4 @@
 # author: zwei
 # email: suifeng20@hotmail.com
 
-rom weibo.db.sqlalchemy.api import *
+from weibo.db.sqlalchemy.api import *
