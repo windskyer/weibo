@@ -53,7 +53,6 @@ class Dbsave(object):
     def db_wbtext_create_or_update(self, values):
         is_exist = self.db_is_wbtext_get_by_mid(values['mid'])
         if is_exist:
-            return
             self.db_wbtext_update(values)
         else:
             self.db_wbtext_create(values)
@@ -78,7 +77,6 @@ class Dbsave(object):
     def db_wbimg_create_or_update(self, values):
         is_exist = self.db_is_wbimg_get_by_url(values['url'])
         if is_exist:
-            return
             self.db_wbimg_update(values)
         else:
             self.db_wbimg_create(values)
@@ -95,6 +93,50 @@ class Dbsave(object):
         try:
             api.wbimg_get_by_mid(mid)
         except exception.WbimgMidNotFound:
+            return False
+        return True
+
+    # get mid  and is_zf from wbimg db
+    def db_wbimg_get_by_mid_and_zf(self,
+                                   mid,
+                                   is_zf=False):
+        try:
+            api.wbimg_get_by_mid_and_zf(mid)
+        except exception.WbimgMidAndZfNotFound:
+            return False
+        return True
+
+    # get mid  and is_zf and pa_mid from wbimg db
+    def db_wbimg_get_by_mid_and_zf(self,
+                                   mid,
+                                   is_zf=False):
+        try:
+            api.wbimg_get_by_mid_and_zf(mid)
+        except exception.WbimgMidAndZfNotFound:
+            return False
+        return True
+
+    # zfwbtext crate or update
+    def db_zfwbtext_create_or_update(self, values):
+        is_exist = self.db_is_zfwbtext_get_by_mid(values['mid'])
+        if is_exist:
+            self.db_zfwbtext_update(values)
+        else:
+            self.db_zfwbtext_create(values)
+
+    # wbtext create
+    def db_zfwbtext_create(self, values):
+        return api.zfwbtext_create(values)
+
+    # wbtext update
+    def db_zfwbtext_update(self, values):
+        return api.zfwbtext_update(values)
+
+    # get mid from zfwbtext db
+    def db_is_zfwbtext_get_by_mid(self, mid):
+        try:
+            api.zfwbtext_get_by_mid(mid)
+        except exception.ZfwbimgMidNotFound:
             return False
         return True
 
@@ -225,23 +267,26 @@ class Simu(Dbsave):
         praised = weibodata.get('praised', 0)
         values.setdefault('praised', praised)
 
-        time_at = weibodata.get('time', None)
+        time_at = weibodata.get('time_at', None)
         values.setdefault('time_at', time_at)
 
         return values
 
-    def get_wbtext_data(self, weibodata):
+    def get_wbtext_data(self, weibodata, iszf=False):
         values = {}
-        texts = []
-        mid = weibodata.get('mid', None)
+        mid = weibodata.get('mid', none)
         values.setdefault('mid', mid)
 
-        uid = weibodata.get('uid', None)
+        uid = weibodata.get('uid', none)
         values.setdefault('uid', uid)
 
-        text = weibodata.get('text', None)
+        text = weibodata.get('text', none)
         values.setdefault('text', text.get('text', None))
-        values.setdefault('is_zf', text.get('is_zf', None))
+        is_zf = weibodata.get('is_zf', None)
+        if not is_zf:
+            is_zf = text.get('is_zf', False)
+
+        values.setdefault('is_zf', is_zf)
 
         face = weibodata.get('face', None)
         values.setdefault('face', face)
@@ -249,12 +294,16 @@ class Simu(Dbsave):
         url = weibodata.get('url', None)
         values.setdefault('url', url)
 
-        zf_mid = weibodata.get('zf_mid', None)
-        values.setdefault('zf_mid', zf_mid)
+        if iszf:
+            pa_mid = weibodata.get('pa_mid', None)
+            values.setdefault('pa_mid', pa_mid)
+        else:
+            zf_mid = weibodata.get('zf_mid', None)
+            values.setdefault('zf_mid', zf_mid)
 
         return values
 
-    def get_wbimg_data(self, weibodata):
+    def get_wbimg_data(self, weibodata, iszf=False):
         values = {}
         mid = weibodata.get('mid', None)
         values.setdefault('mid', mid)
@@ -262,15 +311,22 @@ class Simu(Dbsave):
         uid = weibodata.get('uid', None)
         values.setdefault('uid', uid)
 
-        zf_mid = weibodata.get('zf_mid', None)
-        values.setdefault('zf_mid', zf_mid)
+        is_zf = weibodata.get('is_zf', None)
+
+        if iszf:
+            pa_mid = weibodata.get('pa_mid', None)
+            values.setdefault('pa_mid', pa_mid)
+        else:
+            zf_mid = weibodata.get('zf_mid', None)
+            values.setdefault('zf_mid', zf_mid)
 
         img = weibodata.get('img', None)
         if img:
             urls = img.get('urls', None)
             values.setdefault('urls', urls)
 
-            is_zf = img.get('is_zf', False)
+            if not is_zf:
+                is_zf = img.get('is_zf', False)
             values.setdefault('is_zf', is_zf)
 
         return values
@@ -279,13 +335,23 @@ class Simu(Dbsave):
         weibo = self.get_weibo_data(weibodata)
         self.db_weibo_create_or_update(weibo)
 
+    def save_zfwbtext(self, zf_wb, iszf=True):
+        zf_wbtext = self.get_wbtext_data(zf_wb, iszf)
+        self.db_zfwbtext_create_or_update(zf_wbtext)
+
     def save_wbtext(self, weibodata=None):
         wbtext = self.get_wbtext_data(weibodata)
         self.db_wbtext_create_or_update(wbtext)
         zf_wb = self.get_zf_wb(weibodata)
         if zf_wb:
-            zf_wb_text = self.get_wbtext_data(zf_wb)
-            self.db_wbtext_create_or_update(zf_wb_text)
+            self.save_zfwbtext(zf_wb)
+
+    def save_zfwbimg(self, zf_wb=None, iszf=True):
+        zf_wbimg = self.get_wbimg_data(zf_wb, iszf)
+        if zf_wbimg.has_key('urls'):
+            for url in zf_wbimg.pop('urls'):
+                zf_wbimg['url'] = url
+                self.db_zfwbimg_create_or_update(zf_wbimg)
 
     def save_wbimg(self, weibodata=None):
         wbimg = self.get_wbimg_data(weibodata)
@@ -293,18 +359,14 @@ class Simu(Dbsave):
             for url in wbimg.pop('urls'):
                 wbimg['url'] = url
                 self.db_wbimg_create_or_update(wbimg)
-                #self.db_wbimg_create(wbimg)
 
         zf_wb = self.get_zf_wb(weibodata)
         if zf_wb:
-            zf_wb_img = self.get_wbimg_data(zf_wb)
-            if zf_wb_img.has_key('urls'):
-                for url in zf_wb_img.pop('urls'):
-                    zf_wb_img['url'] = url
-                    self.db_wbimg_create_or_update(zf_wb_img)
+            self.save_zfwbimg(zf_wb)
 
     def save_data(self, weibodatas=None):
         for weibodata in weibodatas:
+            import pdb;pdb.set_trace()
             self.save_weibo(weibodata)
             self.save_wbtext(weibodata)
             self.save_wbimg(weibodata)
@@ -312,5 +374,4 @@ class Simu(Dbsave):
     def save_all_data(self):
         values = self.weibodata
         for nickname, data in values.items():
-            print(nickname)
             self.save_data(data)

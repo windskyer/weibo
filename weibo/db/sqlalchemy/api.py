@@ -324,6 +324,17 @@ def wbtext_get_by_uid(uid, session=None):
 
     return result
 
+def wbtext_get_by_mid_and_zf(mid, is_zf=False, session=None):
+    result = model_query(models.Wbtext, session=session).\
+                     filter_by(mid=mid).\
+                     filter_by(is_zf=is_zf).\
+                     first()
+
+    if not result:
+        raise exception.WbtextMidAndZfNotFound(mid=mid,
+                                               is_zf=is_zf)
+
+    return result
 
 # wbimg table options
 def wbimg_create(values, session=None):
@@ -405,12 +416,14 @@ def wbimg_get_by_id(id, session=None):
     return result
 
 
-def wbimg_get_by_mid(mid, session=None):
+def wbimg_get_by_mid_and_zf(mid, is_zf=False, session=None):
     result = model_query(models.Wbimg, session=session).\
                      filter_by(mid=mid).\
+                     filter_by(is_zf=is_zf).\
                      first()
     if not result:
-        raise exception.WbimgMidNotFound(mid=mid)
+        raise exception.WbimgMidAndZfNotFound(mid=mid,
+                                              is_zf=is_zf)
 
     return result
 
