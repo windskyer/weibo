@@ -8,9 +8,7 @@ sqlalchemy-migrate<=0.10.0
 PyMySQL<=0.6.7
 iso8601<=0.1.11
 
-#如果安装出现错误. 这个 使用  yum 安装-
+# error
 # sudo yum install mariadb.x86_64 mariadb-devel.x86_64
-# fedora 安装 mariadb
-# 用yum 安装 mysql 的 client
-# 解决方案 http://codingnow.cn/language/159.html
+# http://codingnow.cn/language/159.html
 MySQL-python<=1.2.3
