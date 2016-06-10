@@ -30,6 +30,7 @@ url3 = http://weibo.com/jiqun
 
 运行环境 安装方法
 ====
+```
 支持超在系统 centos7 , fedora21, centos6.x
 
 支持 python2.x
