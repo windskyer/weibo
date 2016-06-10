@@ -7,6 +7,7 @@ Crawler same weibo info
 '''
 import os
 import sys
+import argparse
 
 possible_topdir = os.path.normpath(os.path.join(os.path.abspath(__file__),
                                                 os.pardir,
@@ -18,6 +19,7 @@ if os.path.exists(os.path.join(possible_topdir,
     sys.path.insert(0, possible_topdir)
 
 import weibo
+from weibo import version
 from weibo import simu
 from weibo.db import migration
 from weibo.common import cfg
@@ -33,6 +35,63 @@ if os.path.exists(dev_conf):
 else:
     CONF()
     # LOG = logging.setup(*argv[:-1])
+
+class ArgumentParser(argparse.ArgumentParser):
+    def __init__(self, *args, **kwargs):
+        super(ArgumentParser, self).__init__(*args, **kwargs)
+
+    def error(self, message):
+        """error(message: string)
+
+        Prints a usage message incorporating the message to stderr and
+        exits.
+        """
+        self.print_usage(sys.stderr)
+        #FIXME(lzyeval): if changes occur in argparse.ArgParser._check_value
+        choose_from = ' (choose from'
+        progparts = self.prog.partition(' ')
+        self.exit(2, "error: %(errmsg)s\nTry '%(mainp)s help %(subp)s'"
+                  " for more information.\n" %
+                  {'errmsg': message.split(choose_from)[0],
+                   'mainp': progparts[0],
+                   'subp': progparts[2]})
+
+
+def config_file(prog='weibo', description=None):
+    _oparser = ArgumentParser(prog=prog,
+                               description=description,
+                               add_help=False,
+                               epilog='See "weibo help subcommand" '
+                               'for help on a specific command.',
+                              )
+    _oparser.add_argument('-h', '--help',
+                          action='store_true',
+                          help=argparse.SUPPRESS)
+
+    _oparser.add_argument('-V', '--version',
+                          action='version',
+                          version=version.VERSION,
+                         )
+
+    _oparser.add_argument('-d', '--debug',
+                          action='store_true',
+                          help="Print debugging output")
+
+    _oparser.add_argument('--config-file',
+                          nargs='?',
+                          help='Path to a config file to use. Multiple config '
+                          'files can be specified, with values in later '
+                          'files taking precedence. The default files ',
+                         )
+    _oparser.add_argument('--config_file',
+                          help=argparse.SUPPRESS,
+                         )
+    return _oparser.parse_args()
+
+args = config_file()
+if args.config_file:
+    if os.path.exists(args.config_file):
+        CONF(args.config_file)
 
 
 def db_sync(version=None):
@@ -68,10 +127,11 @@ def login():
 
 
 def pweibo():
-    pass
+    config_file()
 
 
 def pmain():
+    config_file()
     login()
 
 
@@ -79,6 +139,8 @@ def amain():
     api()
 
 def dbmain():
+    import pdb;pdb.set_trace()
+    config_file()
     db_sync()
 
 

@@ -8,9 +8,10 @@ import errno
 import inspect
 
 from six import moves
+from weibo import version
 from weibo.common import exception
 
-_BINFILE = None
+_BINFILE = version.OBJECT_CONF
 
 def _normalize_group_name(group_name):
     if group_name == 'DEFAULT':
@@ -47,7 +48,7 @@ def _find_default_config(project=None, exten='.conf'):
     """
     config_files = []
     if project is None:
-        project = _get_binary_name() 
+        project = _get_binary_name()
     default_dirs = _get_config_dirs(project)
     for pdir in default_dirs:
         tempfile = os.path.join(pdir, project + exten)
@@ -61,7 +62,8 @@ def find_config_files(pdir=None, pfile=None, exten='.conf'):
     config_files = []
     confdir = os.path.expanduser('~/.')
     binfile = _get_binary_name() + exten
-    _BINFILE = binfile
+    if not _BINFILE:
+        _BINFILE = binfile
     pdir = pdir or confdir
     if not os.path.exists(pdir):
         os.mkdir(pdir, 0o755)
