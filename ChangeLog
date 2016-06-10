@@ -1,6 +1,8 @@
 CHANGES
 =======
 
+* add cfg config_file help info
+* add cfg config_file help info
 * add zfwbtext, zfwbimg table
 * alter config file
 * alter config file

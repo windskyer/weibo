@@ -32,9 +32,8 @@ dev_conf = os.path.join(possible_topdir,
 
 if os.path.exists(dev_conf):
     CONF(dev_conf)
-else:
-    CONF()
     # LOG = logging.setup(*argv[:-1])
+
 
 class ArgumentParser(argparse.ArgumentParser):
     def __init__(self, *args, **kwargs):
@@ -92,6 +91,10 @@ args = config_file()
 if args.config_file:
     if os.path.exists(args.config_file):
         CONF(args.config_file)
+    else:
+        CONF()
+else:
+    CONF()
 
 
 def db_sync(version=None):
@@ -129,7 +132,6 @@ def login():
 def pweibo():
     config_file()
 
-
 def pmain():
     config_file()
     login()
@@ -139,7 +141,6 @@ def amain():
     api()
 
 def dbmain():
-    import pdb;pdb.set_trace()
     config_file()
     db_sync()
 

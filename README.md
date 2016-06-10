@@ -14,7 +14,7 @@ username =
 password = 
 
 
-设置所有要 爬虫的 url 
+设置所有要 爬虫的 url
 [urls]
 
 #延参法师
@@ -25,15 +25,23 @@ url2 = http://weibo.com/xuecheng
 
 #济群法师
 url3 = http://weibo.com/jiqun
+```
 
 
-2, 运行 方法
+运行环境 安装方法
+====
+支持超在系统 centos7 , fedora21, centos6.x
 
 支持 python2.x
 #python2 run.py
 
-支持 python3.x
+不支持 python3.x
 #python3 run.py
+
+安装方法
+pip install -r requirements.txt
+python setup.py install
+
 ```
 
 database
@@ -46,14 +54,13 @@ sql_connection = mysql://weibo:weibo@192.168.122.206/weibo?charset=utf8
 2, 在mysql数据库 中的 创建 weibo 数据库
 create database weibo;
 
-3, 通不数据库表格
-bin/weibo_db
+3, 同步数据库表格
+weibodb --config-file etc/weibo.conf
 ```
 
 获取数据
 ====
 ```
 1, 执行获取命令
-bin/weibo_pc
-
+weibopc --config-file etc/weibo.conf
 ```
