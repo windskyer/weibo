@@ -1,0 +1,17 @@
+CHANGES
+=======
+
+* add zfwbtext, zfwbimg table
+* alter config file
+* alter config file
+* add db api weibo, wbtext, wbimg table
+* alter weibo class file
+* add jiexi html class method
+* add img html
+* psaser html file info
+* add db api
+* add db api
+* delete .env
+* add object weibo
+* add object weibo
+* Initial commit
