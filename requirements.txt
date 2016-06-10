@@ -1,9 +1,16 @@
 requests
+bs4<=0.0.1
 six<=1.9.0
 rsa<=3.4.2
 pbr>=1.8
 SQLAlchemy<=1.0.11
 sqlalchemy-migrate<=0.10.0
 PyMySQL<=0.6.7
-MySQL-python<=1.2.3
 iso8601<=0.1.11
+
+#如果安装出现错误. 这个 使用  yum 安装-
+# sudo yum install mariadb.x86_64 mariadb-devel.x86_64
+# fedora 安装 mariadb
+# 用yum 安装 mysql 的 client
+# 解决方案 http://codingnow.cn/language/159.html
+MySQL-python<=1.2.3
