@@ -1,5 +1,5 @@
 requests
-bs4
+bs4<=0.0.1
 six<=1.9.0
 rsa<=3.4.2
 pbr>=1.8
