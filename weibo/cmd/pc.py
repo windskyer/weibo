@@ -133,7 +133,6 @@ def pweibo():
     config_file()
 
 def pmain():
-    config_file()
     login()
 
 
@@ -141,10 +140,8 @@ def amain():
     api()
 
 def dbmain():
-    config_file()
     db_sync()
 
 
 if __name__ == '__main__':
     dbmain()
-    #pmain()
