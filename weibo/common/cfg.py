@@ -113,6 +113,7 @@ class BaseParser(object):
         value = value.strip()
         if value and value[0] == value[-1] and value.startswith(("\"", "'")):
             value = value[1:-1]
+
         return key.strip(), [value]
 
     def parse(self, lineiter):
@@ -193,7 +194,7 @@ class ConfigParser(BaseParser):
         self._normalized = normalized
 
     def parse(self):
-        with open(self.filename) as f:  
+        with open(self.filename) as f:
             return super(ConfigParser, self).parse(f)
 
     def new_section(self, section):
@@ -203,7 +204,7 @@ class ConfigParser(BaseParser):
         if self._normalized is not None:
             self._normalized.setdefault(_normalize_group_name(self.section),{})
 
-    def assignment(self, key, value):   
+    def assignment(self, key, value):
         if not self.section:
             raise self.error_no_section()
 
@@ -301,19 +302,32 @@ class _Namespace(_SubNamespace):
             if group == "DEFAULT":
                 self.set_default_opts()
 
-        for group in self.groups: 
+        for group in self.groups:
             section = self.sections[group]
             sub = self.namespaces[group]
-            for k,v in section.items():
+            for k, v in section.items():
                 if (len(v) < 2):
-                    subvalue = ''.join(v)
-                    if subvalue == "True" or subvalue == "true":
-                        subvalue = True
-                    if subvalue == "False" or subvalue == "false":
-                        subvalue = False
-                    sub.setattr(k, subvalue)
+                    value_list = v[0].split(',')
+                    if len(value_list) > 1:
+                        value_lists = []
+                        for value_l in value_list:
+                            value_l_str = value_l.strip()
+                            if value_l_str:
+                                value_lists.append(value_l_str)
+
+                        if len(value_lists):
+                            value = value_lists
+                        sub.setattr(k, value_lists)
+                    else:
+                        subvalue = ''.join(v)
+                        if subvalue == "True" or subvalue == "true":
+                            subvalue = True
+                        if subvalue == "False" or subvalue == "false":
+                            subvalue = False
+                        sub.setattr(k, subvalue)
                 else:
                     sub.setattr(k, v)
+
 
     def set_default_opts(self):
         for key, value in self.sections.get("DEFAULT").items():
@@ -384,3 +398,6 @@ class ConfigOpts(object):
         return self.__getattr__(k)
 
 CONF = ConfigOpts()
+
+if __name__ == '__main__':
+    CONF('weibo.conf')
