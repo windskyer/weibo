@@ -81,10 +81,14 @@ class WeiboUidNotFound(WeiboError):
 class WbtextMidExists(WeiboError):
     msg_fmt = ("Wbtext %(mid)s is exists.")
 
+class ZfwbtextMidExists(WeiboError):
+    msg_fmt = ("zfwbtext %(mid)s is exists.")
 
 class WbtextMidNotFound(WeiboError):
     msg_fmt = ("Wbtext %(mid)s could not be found.")
 
+class ZfwbtextMidNotFound(WeiboError):
+    msg_fmt = ("zfwbtext %(mid)s could not be found.")
 
 class WbtextIdNotFound(WeiboError):
     msg_fmt = ("Wbtext %(id)s could not be found.")
@@ -96,14 +100,23 @@ class WbtextUidNotFound(WeiboError):
 class WbimgUrlNotFound(WeiboError):
     msg_fmt = ("Wbimg %(url)s could not be found.")
 
+class ZfwbimgUrlNotFound(WeiboError):
+    msg_fmt = ("Zfwbimg %(url)s could not be found.")
+
 class WbimgUrlExists(WeiboError):
     msg_fmt = ("Wbimg %(url)s is exists.")
+
+class ZfwbimgUrlExists(WeiboError):
+    msg_fmt = ("Zfwbimg %(url)s is exists.")
 
 class WbimgMidExists(WeiboError):
     msg_fmt = ("Wbimg %(mid)s is exists.")
 
 class WbimgMidNotFound(WeiboError):
     msg_fmt = ("Wbimg %(mid)s could not be found.")
+
+class ZfwbimgMidNotFound(WeiboError):
+    msg_fmt = ("zfwbimg %(mid)s could not be found.")
 
 class WbimgIdNotFound(WeiboError):
     msg_fmt = ("Wbimg %(id)s could not be found.")
@@ -134,4 +147,8 @@ class UserdataNameNotFound(WeiboError):
 class NotFoundChildrenTag(WeiboError):
     msg_fmt = ("Not Found %(name)s attrs %(class)s, "
                "%(nova-type)s children tag ")
+
+
+class DetailNotFound(WeiboError):
+    msg_fmt = ("Not Found weibo detail info")
 

@@ -21,6 +21,7 @@ if os.path.exists(os.path.join(possible_topdir,
 import weibo
 from weibo import version
 from weibo import simu
+from weibo import exception
 from weibo.db import migration
 from weibo.common import cfg
 from weibo.common import log
@@ -124,7 +125,13 @@ def login():
     # 模拟登陆的功能扩展待完善
     simulogin = simu.Simu()
 
-    simulogin.detail()
+    try:
+        simulogin.detail()
+    except exception.DetailNotFound:
+        simu.Simu.reset_login()
+        simulogin = simu.Simu()
+        simulogin.detail()
+
     simulogin.save_all_data()
     # print(simulogin.detail('http://weibo.com/kaifulee'))
 
@@ -134,7 +141,6 @@ def pweibo():
 
 def pmain():
     login()
-
 
 def amain():
     api()

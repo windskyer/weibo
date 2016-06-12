@@ -65,6 +65,7 @@ class Dbsave(object):
             return False
         return True
 
+
     # wbimg create
     def db_wbimg_create(self, values):
         return api.wbimg_create(values)
@@ -80,6 +81,7 @@ class Dbsave(object):
             self.db_wbimg_update(values)
         else:
             self.db_wbimg_create(values)
+
     # get url from weibo db
     def db_is_wbimg_get_by_url(self, url):
         try:
@@ -136,7 +138,42 @@ class Dbsave(object):
     def db_is_zfwbtext_get_by_mid(self, mid):
         try:
             api.zfwbtext_get_by_mid(mid)
+        except exception.ZfwbtextMidNotFound:
+            return False
+        return True
+
+
+
+
+    # zfwbimg crate or update
+    def db_zfwbimg_create_or_update(self, values):
+        is_exist = self.db_is_zfwbimg_get_by_url(values['url'])
+        if is_exist:
+            self.db_zfwbimg_update(values)
+        else:
+            self.db_zfwbimg_create(values)
+
+    # zfwbimg create
+    def db_zfwbimg_create(self, values):
+        return api.zfwbimg_create(values)
+
+    # wbimg update
+    def db_zfwbimg_update(self, values):
+        return api.zfwbimg_update(values)
+
+    # get mid from zfwbimg db
+    def db_is_zfwbimg_get_by_mid(self, mid):
+        try:
+            api.zfwbimg_get_by_mid(mid)
         except exception.ZfwbimgMidNotFound:
+            return False
+        return True
+
+    # get url from zfweibo db
+    def db_is_zfwbimg_get_by_url(self, url):
+        try:
+            api.zfwbimg_get_by_url(url)
+        except exception.ZfwbimgUrlNotFound:
             return False
         return True
 
@@ -212,6 +249,17 @@ class Simu(Dbsave):
         cls.cookie_file = CONF.cookie_file
 
     @classmethod
+    def reset_login(cls):
+        if os.path.exists(cls.cookie_file):
+            os.remove(cls.cookie_file)
+
+        cls.set_env()
+        if not os.path.exists(cls.cookie_file):
+            print("weibo login is reset")
+            cls.pre_weibo_login()
+        return 0
+
+    @classmethod
     def check_login(cls):
         cls.set_env()
         if not os.path.exists(cls.cookie_file):
@@ -274,13 +322,13 @@ class Simu(Dbsave):
 
     def get_wbtext_data(self, weibodata, iszf=False):
         values = {}
-        mid = weibodata.get('mid', none)
+        mid = weibodata.get('mid', None)
         values.setdefault('mid', mid)
 
-        uid = weibodata.get('uid', none)
+        uid = weibodata.get('uid', None)
         values.setdefault('uid', uid)
 
-        text = weibodata.get('text', none)
+        text = weibodata.get('text', None)
         values.setdefault('text', text.get('text', None))
         is_zf = weibodata.get('is_zf', None)
         if not is_zf:
@@ -349,16 +397,21 @@ class Simu(Dbsave):
     def save_zfwbimg(self, zf_wb=None, iszf=True):
         zf_wbimg = self.get_wbimg_data(zf_wb, iszf)
         if zf_wbimg.has_key('urls'):
-            for url in zf_wbimg.pop('urls'):
-                zf_wbimg['url'] = url
-                self.db_zfwbimg_create_or_update(zf_wbimg)
+            urls = zf_wbimg.pop('urls')
+            if urls:
+                for url in urls:
+                    zf_wbimg['url'] = url
+                    self.db_zfwbimg_create_or_update(zf_wbimg)
+
 
     def save_wbimg(self, weibodata=None):
         wbimg = self.get_wbimg_data(weibodata)
         if wbimg.has_key('urls'):
-            for url in wbimg.pop('urls'):
-                wbimg['url'] = url
-                self.db_wbimg_create_or_update(wbimg)
+            urls = wbimg.pop('urls')
+            if urls:
+                for url in urls:
+                    wbimg['url'] = url
+                    self.db_wbimg_create_or_update(wbimg)
 
         zf_wb = self.get_zf_wb(weibodata)
         if zf_wb:
@@ -366,7 +419,6 @@ class Simu(Dbsave):
 
     def save_data(self, weibodatas=None):
         for weibodata in weibodatas:
-            import pdb;pdb.set_trace()
             self.save_weibo(weibodata)
             self.save_wbtext(weibodata)
             self.save_wbimg(weibodata)

@@ -160,6 +160,27 @@ class Weibo(BASE, WeiboBase):
     # 发布时间
     time_at = Column(String(150))
 
+class Zfwbimg(BASE, WeiboBase):
+    __tablename__ = 'zfwbimg'
+
+    # 微博mid
+    mid = Column(BigInteger, nullable=False)
+
+    # 用户UID
+    uid = Column(BigInteger, nullable=False)
+
+    # img所在地方
+    location = Column(String(200))
+
+    # img 的 url 地址
+    url = Column(String(200))
+
+    # 是否是转发微博
+    is_zf = Column(Boolean, default=False)
+
+    # 转发微博的mid
+    pa_mid = Column(BigInteger, nullable=True)
+
 
 class Wbimg(BASE, WeiboBase):
     __tablename__ = 'wbimg'
@@ -178,6 +199,9 @@ class Wbimg(BASE, WeiboBase):
 
     # 是否是转发微博
     is_zf = Column(Boolean, default=False)
+
+    # 被转发weibo 的mid
+    zf_mid = Column(BigInteger, nullable=True)
 
 
 class Wbtext(BASE, WeiboBase):
@@ -201,3 +225,30 @@ class Wbtext(BASE, WeiboBase):
     # 是否是转发微博
     is_zf = Column(Boolean, default=False)
 
+    # 转发weibo 的mid
+    zf_mid = Column(BigInteger, nullable=True)
+
+
+class Zfwbtext(BASE, WeiboBase):
+    __tablename__ = 'zfwbtext'
+
+    # 微博mid
+    mid = Column(BigInteger, nullable=False)
+
+    # 用户UID
+    uid = Column(BigInteger, nullable=False)
+
+    # text info
+    text = Column(Text)
+
+    # face 表情 info
+    face = Column(Text)
+
+    # 文本中的link 的 url 地址
+    url = Column(Text)
+
+    # 是否是转发微博
+    is_zf = Column(Boolean, default=False)
+
+    # 被转发weibo 的mid
+    pa_mid = Column(BigInteger, nullable=True)

@@ -309,7 +309,7 @@ class JDetail(object):
             img_videos_div = self._get_children_tag(jx=jx,
                                                     name='div',
                                                     attrs=div_attrs)
-        except excetion.NotFoundChildrenTag:
+        except exception.NotFoundChildrenTag:
             return None
         return img_videos_div
 
@@ -469,6 +469,7 @@ class Jhtml(object):
 
     def wb_img(self, WB=None, zf=False):
         # 图片
+        # import pdb;pdb.set_trace()
         if zf:
             img = self.jdetail.z_jx.get_wb_img()
         else:
@@ -574,8 +575,8 @@ class Jhtml(object):
             # 初始化wb 信息
             #import pdb;pdb.set_trace()
             self.wb(wb)
-            wb_info = self.get_wb_info(wb, False)
             is_zf = self.is_zf_wb()
+            wb_info = self.get_wb_info(wb, False)
             if is_zf:
                 wb_info.setdefault('is_zf', is_zf)
                 zf_wb = self.get_wb_info(wb, True)
@@ -595,4 +596,7 @@ class Jhtml(object):
 
         content = self.tmp_file(content)
         wb_detail = self.wb_detail(content)
+        if not len(wb_detail):
+            raise exception.DetailNotFound()
+
         return self.wb_all_jiexi2(wb_detail)

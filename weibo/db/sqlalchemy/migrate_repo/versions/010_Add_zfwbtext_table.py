@@ -29,10 +29,10 @@ def _create_zfwbtext_table(migrate_engine, drop=False):
                 Column('is_zf', Boolean, default=False),
 
                 # 表情 链接
-                # Column('face', Text),
+                Column('face', Text),
 
                 # http 链接地址
-                # Column('url', Text),
+                Column('url', Text),
 
                 # parent mid
                 Column('pa_mid', BigInteger),

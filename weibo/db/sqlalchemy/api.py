@@ -436,6 +436,267 @@ def wbimg_get_by_uid(uid, session=None):
 
     return result
 
+def wbimg_get_by_mid(mid, session=None):
+    result = model_query(models.Wbimg, session=session).\
+                     filter_by(mid=mid).\
+                     all()
+    if not result:
+        raise exception.WbimgMidNotFound(uid=uid)
+
+    return result
+
+
+
+
+# zfwbimg table options
+def zfwbimg_create(values, session=None):
+    if not session:
+        session = get_session()
+
+    url = values['url']
+    zfwbimg = _get_query(models.Zfwbimg,
+                       models.Zfwbimg.url,
+                       url,
+                       session=session,
+                       read_deleted='no').first()
+
+    if not zfwbimg:
+        zfwbimg = models.Zfwbimg()
+        zfwbimg.update(values)
+        zfwbimg.save(session=session)
+    else:
+        raise exception.ZfwbimgUrlExists(url=url)
+
+    return zfwbimg_get_by_url(zfwbimg.url)
+
+
+def zfwbimg_update(values, session=None):
+    if not session:
+        session = get_session()
+    url = values.get('url')
+    with session.begin():
+        zfwbimg = zfwbimg_get_by_url(url, session=session)
+        zfwbimg.update(values)
+        zfwbimg.save(session=session)
+
+    return zfwbimg_get_by_url(url)
+
+
+def zfwbimg_delete(id, session=None):
+    if not session:
+        session = get_session()
+
+    zfwbimg = zfwbimg_get_by_id(id)
+    if zfwbimg:
+        zfwbimg.delete()
+
+
+def zfwbimg_delete_mid(mid, session=None):
+    if not session:
+        session = get_session()
+
+    zfwbimgs = zfwbimg_get_by_mid(mid)
+    for zfwbimg in zfwbimgs:
+        zfwbimg.delete()
+
+
+def zfwbimg_delete_uid(uid, session=None):
+    if not session:
+        session = get_session()
+
+    zfwbimgs = zfwbimg_get_by_uid(uid)
+    if zfwbimg in zfwbimgs:
+        zfwbimg.delete()
+
+def zfwbimg_get_by_url(url, session=None):
+    result = model_query(models.Zfwbimg, session=session).\
+                     filter_by(url=url).\
+                     first()
+    if not result:
+        raise exception.ZfwbimgUrlNotFound(url=url)
+
+    return result
+
+
+def zfwbimg_get_by_id(id, session=None):
+    result = model_query(models.Zfwbimg, session=session).\
+                     filter_by(id=id).\
+                     first()
+    if not result:
+        raise exception.ZfwbimgIdNotFound(id=id)
+
+    return result
+
+
+def zfwbimg_get_by_mid_and_zf(mid, is_zf=False, session=None):
+    result = model_query(models.Zfwbimg, session=session).\
+                     filter_by(mid=mid).\
+                     filter_by(is_zf=is_zf).\
+                     first()
+    if not result:
+        raise exception.ZfwbimgMidAndZfNotFound(mid=mid,
+                                              is_zf=is_zf)
+
+    return result
+
+def zfwbimg_get_by_uid(uid, session=None):
+    result = model_query(models.Wbimg, session=session).\
+                     filter_by(uid=uid).\
+                     all()
+    if not result:
+        raise exception.ZfwbimgUidNotFound(uid=uid)
+
+    return result
+
+def zfwbimg_get_by_mid(mid, session=None):
+    result = model_query(models.Zfwbimg, session=session).\
+                     filter_by(mid=mid).\
+                     all()
+    if not result:
+        raise exception.ZfwbimgMidNotFound(mid=mid)
+
+    return result
+
+
+# zfwbtext table options
+def zfwbtext_create(values, session=None):
+    if not session:
+        session = get_session()
+
+    zfwbtext = _get_query(models.Zfwbtext,
+                       models.Zfwbtext.mid,
+                       values['mid'],
+                       session=session,
+                       read_deleted='no').first()
+
+    if not zfwbtext:
+        zfwbtext = models.Zfwbtext()
+        zfwbtext.update(values)
+        zfwbtext.save(session=session)
+    else:
+        raise exception.ZfwbtextMidExists(mid=mid)
+
+    return zfwbtext_get_by_mid(zfwbtext.mid)
+
+
+def zfwbtext_update(values, session=None):
+    if not session:
+        session = get_session()
+    mid = values.pop('mid')
+    with session.begin():
+        zfwbtext = zfwbtext_get_by_mid(mid, session=session)
+        zfwbtext.update(values)
+        zfwbtext.save(session=session)
+
+    return zfwbtext_get_by_mid(mid)
+
+
+def zfwbtext_delete(id, session=None):
+    if not session:
+        session = get_session()
+
+    zfwtext = zfwbtext_get_by_id(id)
+    if zfwbtext:
+        zfwbtext.delete()
+
+
+def zfwbtext_delete_mid(mid, session=None):
+    if not session:
+        session = get_session()
+
+    zfwbtext = zfwbtext_get_by_mid(mid)
+    if zfwbtext:
+        zfwbtext.delete()
+
+
+def zfwbtext_delete_uid(uid, session=None):
+    if not session:
+        session = get_session()
+
+    zfwbtexts = zfwbtext_get_by_uid(uid)
+    if zfwbtext in zfwbtexts:
+        zfwbtext.delete()
+
+
+def zfwbtext_get_by_id(id, session=None):
+    result = model_query(models.Zfwbtext, session=session).\
+                     filter_by(id=id).\
+                     first()
+    if not result:
+        raise exception.zfwbtextIdNotFound(id=id)
+
+    return result
+
+
+def zfwbtext_get_by_mid(mid, session=None):
+    result = model_query(models.Zfwbtext, session=session).\
+                     filter_by(mid=mid).\
+                     first()
+    if not result:
+        raise exception.ZfwbtextMidNotFound(mid=mid)
+
+    return result
+
+
+def zfwbtext_get_by_uid(uid, session=None):
+    result = model_query(models.Zfwbtext, session=session).\
+                     filter_by(uid=uid).\
+                     all()
+    if not result:
+        raise exception.zfwbtextUidNotFound(uid=uid)
+
+    return result
+
+def zfwbtext_get_by_mid_and_zf(mid, is_zf=False, session=None):
+    result = model_query(models.Zfwbtext, session=session).\
+                     filter_by(mid=mid).\
+                     filter_by(is_zf=is_zf).\
+                     first()
+
+    if not result:
+        raise exception.zfwbtextMidAndZfNotFound(mid=mid,
+                                               is_zf=is_zf)
+
+    return result
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 if __name__ == '__main__':
     CONF('weibo.conf')
