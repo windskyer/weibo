@@ -617,17 +617,17 @@ if __name__ == '__main__':
     # print(html.getHTML('http://www.weibo.com/kaifulee'))
     import pdb
     #pdb.set_trace()
-    aa = simu()
-    aa.pre_weibo_login
-    print(aa.detail('http://weibo.com/kaifulee'))
+    #aa = simu()
+    #aa.pre_weibo_login
+    #print(aa.detail('http://weibo.com/kaifulee'))
     #wburl = "http://weibo.com/u/3538755522?is_all=1#1464674122618"
     #print(aa.detail(wburl))
 
     # API 参考 http://open.weibo.com/wiki/%E5%BE%AE%E5%8D%9AAPI
     # 使用参考 https://github.com/lxyu/weibo
-    #api = useAPI()
+    api = useAPI()
     #print(api.get('statuses/user_timeline', 200, uid=3538755522))
-    #print(api.get('account/get_uid'))
+    print(api.get('account/get_uid'))
     #print(get_all_mid(api))
     #print mids
     #get_one_mid(api, 3979151650306475)

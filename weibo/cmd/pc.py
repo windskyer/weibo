@@ -22,19 +22,16 @@ import weibo
 from weibo import version
 from weibo import simu
 from weibo import exception
+from weibo.api import api
 from weibo.db import migration
 from weibo.common import cfg
 from weibo.common import log
 
 CONF = cfg.CONF
+import pdb;pdb
 dev_conf = os.path.join(possible_topdir,
                         'etc',
                         'weibo.conf')
-
-if os.path.exists(dev_conf):
-    CONF(dev_conf)
-    # LOG = logging.setup(*argv[:-1])
-
 
 class ArgumentParser(argparse.ArgumentParser):
     def __init__(self, *args, **kwargs):
@@ -89,13 +86,18 @@ def config_file(prog='weibo', description=None):
     return _oparser.parse_args()
 
 args = config_file()
-if args.config_file:
-    if os.path.exists(args.config_file):
-        CONF(args.config_file)
+
+if os.path.exists(dev_conf):
+    CONF(dev_conf)
+    # LOG = logging.setup(*argv[:-1])
+else:
+    if args.config_file:
+        if os.path.exists(args.config_file):
+            CONF(args.config_file)
+        else:
+            CONF()
     else:
         CONF()
-else:
-    CONF()
 
 
 def db_sync(version=None):
@@ -108,13 +110,14 @@ def db_version(self):
     print migration.db_version()
 
 
-def api():
+def client():
     # API 参考 http://open.weibo.com/wiki/%E5%BE%AE%E5%8D%9AAPI
     # 使用参考 https://github.com/lxyu/weibo
-    api = weibo.useAPI()
+    useapi = api.useAPI()
+    print(useapi.get('users/show', screen_name="海涛法师"))
     # print(api.get('statuses/user_timeline'))
     # print(api.get('statuses/user_timeline/ids'))
-    print(api.get('statuses/queryid', mid="1035051413304027"))
+    #print(useapi.get('statuses/queryid', mid="1035051413304027"))
     # print(api.post('statuses/update', status='test from my api'))
 
 
@@ -143,7 +146,7 @@ def pmain():
     login()
 
 def amain():
-    api()
+    client()
 
 def dbmain():
     db_sync()
