@@ -1,12 +1,16 @@
 # --*-- coding: utf-8 --*--
 
-from weibo import server
+import eventlet
+eventlet.monkey_patch()
+
+from weibo import service
 from weibo.api import api
 
 from weibo.common import cfg
 from weibo.common import log as logging
 
 CONF = cfg.CONF
+
 
 class Client(objct):
     def __init__(self, conf, *args, **kwargs):
@@ -16,6 +20,18 @@ class Client(objct):
             except:
                 raise exception.AppkeyError()
         useapi = api.useAPI(conf)
+
+    @classmethod
+    def create(cls, report_interval=None, periodic_interval=None):
+        """Instantiates class and passes back application object.
+
+        :param report_interval: defaults to FLAGS.report_interval
+        :param periodic_interval: defaults to FLAGS.periodic_interval
+        :param periodic_fuzzy_delay: defaults to FLAGS.periodic_fuzzy_delay
+
+        """
+        pass
+
 
     def start(self):
         pass
@@ -35,5 +51,11 @@ class Client(objct):
 
 def main():
     api_keys = CONF.api_key
+    launcher = service.ProcessLauncher()
     for api_key in api_keys:
-        server.create(Client(CONF[api_key]))
+        conf = CONF.api_key
+        client = Client(conf)
+        server.create()
+        launcher.launch_server(server)
+
+    launcher.wait()
