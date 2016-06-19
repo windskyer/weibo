@@ -19,15 +19,19 @@ videos_dir =
 # eg: enable_multi = user1, user2
 # so: [user1] [user2] options
 enable_multiusers = user1
-enable_multitargets = t1, t2, t3, t4, t5 , t6, t7, t8
+enable_multitargets = t1
 
 # set more app key
 api_key = api1, api2, api3
 
 # set log file or dir
-log_file = weibo.log
-log_dir = /var/log/
+log_file = /tmp/weibo.log
+# log_dir = /var/log/
 use_stderr = True
+
+# set log datetime
+log_date_format = %Y-%m-%d %H:%M:%S
+
 
 [database]
 sql_connection = mysql://weibo:weibo@192.168.122.206/weibo?charset=utf8
@@ -73,7 +77,6 @@ password = suifeng20@
 [t]
 nickname = zwei10078
 url = http://weibo.com/5936488911
-
 [t0]
 nickname = 张爱玲
 url = http://weibo.com/p/1005053538755522
@@ -101,72 +104,62 @@ url = http://weibo.com/u/2054935423?refer_flag=1001030201_&is_all=1
 nickname = 悟妙法师
 url = http://weibo.com/somoao?refer_flag=1001030201_&is_hot=1
 
-[t6]
+[target1]
 #恒愚法师
-nickname = 恒愚法师
 url6 = http://weibo.com/u/1864955721?refer_flag=1001030201_&is_hot=1
 
-[t7]
-nickname = 恒庄法师
+[target1]
+#恒庄法师
 url7 = http://weibo.com/u/2397485727?refer_flag=1001030201_&is_hot=1
 
-[t8]
-nickname = 恒东法师
+[target1]
+#恒东法师
 url8 = http://weibo.com/u/1886540111?refer_flag=1001030201_&is_hot=1
 
-[t9]
-nickname = 顿珠法师
+[target1]
+#顿珠法师
 url9 = http://weibo.com/u/1635624847?refer_flag=1001030201_&is_hot=1
 
-[t10]
+[target1]
 #传喜法师
-nickname = 传喜法师
 url10 = http://weibo.com/chuanxifashi?refer_flag=1001030201_&is_hot=1
 
-[t11]
+[target1]
 #道坚法师
-nickname = 道坚法师
 url = http://weibo.com/daojianfashi?refer_flag=1001030201_&is_hot=1
 
-[t12]
+[target1]
 #超能法师
-nickname = 超能法师
 url = http://weibo.com/kysnc?refer_flag=1001030201_&is_hot=1
 
-[t13]
+[target1]
 #园善法师
-nickname = 园善法师
 url = http://weibo.com/yuanshan666666?refer_flag=1001030201_&is_hot=1
 
-[t14]
+[target1]
 #昌亮法师
-nickname = 昌亮法师
 url = http://weibo.com/changliangfashi?refer_flag=1001030201_&is_hot=1
 
-[t15]
+[target1]
 #纯一法师
-nickname = 纯一法师
 url = http://weibo.com/scy23?refer_flag=1001030201_&is_hot=1
 
-[t16]
+[target1]
 #恒鹏法师
-nickname = 恒鹏法师
 url = http://weibo.com/u/1815353394?refer_flag=1001030201_&is_hot=1
 
-[t17]
+[target1]
 #圣慧法师
-nickname = k圣慧法师
 url = http://weibo.com/shenghuifashi?refer_flag=1001030201_
 
-[t18]
+[target1]
 #觉醒法师
-nickname = 觉醒法师
 url = http://weibo.com/juexingfashi?refer_flag=1001030201_&is_hot=1&noscale_head=1#_0
 
-[t19]
+[target1]
 #恒唯法师
 url = http://weibo.com/278002219?refer_flag=1001030201_&is_hot=1
 
-[t20]
+[target1]
 #理净法师
 url = http://weibo.com/514789089?refer_flag=1001030201_&is_hot=1

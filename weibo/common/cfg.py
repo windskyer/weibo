@@ -256,8 +256,10 @@ class ConfigParser(BaseParser):
 class _SubNamespace(object):
     def __init__(self, group):
         self.group = group
+        self.keys = []
 
     def setattr(self, key, value):
+        self.keys.append(key)
         setattr(self, key, value)
 
     def getattr(self, key):
@@ -267,7 +269,7 @@ class _SubNamespace(object):
             raise NoSuchOptError(key=key)
 
     def __getattribute__(self, k):
-        return object.__getattribute__(self, k) 
+        return object.__getattribute__(self, k)
 
     def __setattr__(self, k, v):
         self.__dict__[k] = v
@@ -282,7 +284,8 @@ class _SubNamespace(object):
         return v
 
     def __str__(self):
-        return "<[%s] Group all opts>" % self.all_groups
+        return "<Sections [%s] all opts [%s]>" % (self.group,
+                                                  ','.join(self.keys))
 
     def __repr__(self):
         return self.__str__()
@@ -306,31 +309,34 @@ class _Namespace(_SubNamespace):
             section = self.sections[group]
             sub = self.namespaces[group]
             for k, v in section.items():
-                if (len(v) < 2):
-                    value_list = v[0].split(',')
-                    if len(value_list) > 1:
-                        value_lists = []
-                        for value_l in value_list:
-                            value_l_str = value_l.strip()
-                            if value_l_str:
-                                value_lists.append(value_l_str)
+                v = self.set_list_and_bool_opts(v)
+                sub.setattr(k, v)
 
-                        if len(value_lists):
-                            value = value_lists
-                        sub.setattr(k, value_lists)
-                    else:
-                        subvalue = ''.join(v)
-                        if subvalue == "True" or subvalue == "true":
-                            subvalue = True
-                        if subvalue == "False" or subvalue == "false":
-                            subvalue = False
-                        sub.setattr(k, subvalue)
-                else:
-                    sub.setattr(k, v)
+    def set_list_and_bool_opts(self, v):
+        if (len(v) < 2):
+            value_list = v[0].split(',')
+            if len(value_list) > 1:
+                value_lists = []
+                for value_l in value_list:
+                    value_l_str = value_l.strip()
+                    if value_l_str:
+                        value_lists.append(value_l_str)
 
+                    if len(value_lists):
+                        value = value_lists
+            else:
+                subvalue = ''.join(v)
+                if subvalue == "True" or subvalue == "true":
+                    subvalue = True
+                if subvalue == "False" or subvalue == "false":
+                    subvalue = False
+                value = subvalue
+            return value
+        return v
 
     def set_default_opts(self):
         for key, value in self.sections.get("DEFAULT").items():
+            value = self.set_list_and_bool_opts(value)
             setattr(self, key, value)
 
     def setattr(self, group):
@@ -368,7 +374,7 @@ class _Namespace(_SubNamespace):
         return v
 
     def __str__(self):
-        return "Namespace all [%s] Group" % ' '.join(self.all_groups)
+        return "Namespace all [%s] Group" % ','.join(self.all_groups)
 
 class ConfigOpts(object):
     def __init__(self):
@@ -400,4 +406,8 @@ class ConfigOpts(object):
 CONF = ConfigOpts()
 
 if __name__ == '__main__':
-    CONF('weibo.conf')
+    CONF('weibo.confbak')
+    print(CONF.enable_multitargets)
+    print(CONF.DEFAULT.enable_multitargets)
+    print(CONF.t1.nickname)
+    print(CONF['t1'].nickname)

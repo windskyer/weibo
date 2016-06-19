@@ -627,7 +627,7 @@ if __name__ == '__main__':
     # 使用参考 https://github.com/lxyu/weibo
     api = useAPI()
     #print(api.get('statuses/user_timeline', 200, uid=3538755522))
-    print(api.get('account/get_uid'))
+    #print(api.get('account/get_uid'))
     #print(get_all_mid(api))
     #print mids
     #get_one_mid(api, 3979151650306475)
@@ -641,8 +641,8 @@ if __name__ == '__main__':
     #ujson = api.get('statuses/show_batch', ids="3538755522")
     #ujson = api.get('users/show', screen_name="海涛法师")
     #print ujson.get('profile_url')
-    #ujson = api.get('users/show', screen_name="张爱玲文记")
+    ujson = api.get('users/show', screen_name="张爱玲文记")
     #ujson = api.get('statuses/querymid', id=3538755522, type=2, is_batch=1)
-    #print(ujson)
+    print(ujson)
     #ujson = api.get('users/counts', uids=1337970873)#    print(ujson)
     # print(api.post('statuses/update', status='test from my api'))

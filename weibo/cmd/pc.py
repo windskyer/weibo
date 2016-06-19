@@ -19,8 +19,9 @@ if os.path.exists(os.path.join(possible_topdir,
     sys.path.insert(0, possible_topdir)
 
 import weibo
-from weibo import version
 from weibo import simu
+from weibo import version
+from weibo import userdata
 from weibo import exception
 from weibo.api import api
 from weibo.db import migration
@@ -113,8 +114,10 @@ def db_version(self):
 def client():
     # API 参考 http://open.weibo.com/wiki/%E5%BE%AE%E5%8D%9AAPI
     # 使用参考 https://github.com/lxyu/weibo
-    useapi = api.useAPI()
-    print(useapi.get('users/show', screen_name="海涛法师"))
+    #useapi = api.useAPI()
+    udata = userdata.Userdata()
+    udata.save_all_users()
+    #print(useapi.get('users/show', screen_name="海涛法师"))
     # print(api.get('statuses/user_timeline'))
     # print(api.get('statuses/user_timeline/ids'))
     #print(useapi.get('statuses/queryid', mid="1035051413304027"))

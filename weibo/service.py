@@ -173,8 +173,6 @@ class ProcessLauncher(object):
 
 
 
-
-
 # NOTE(vish): the global launcher is to maintain the existing
 #             functionality of calling service.serve +
 #             service.wait
