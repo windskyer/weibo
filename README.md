@@ -68,5 +68,7 @@ weibopc --config-file etc/weibo.conf
 
 获取用户信息
 ====
+```
 weibapi --config-file etc/weibo.conf
+```
 
