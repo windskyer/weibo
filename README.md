@@ -65,3 +65,8 @@ weibodb --config-file etc/weibo.conf
 1, 执行获取命令
 weibopc --config-file etc/weibo.conf
 ```
+
+获取用户信息
+====
+weibapi --config-file etc/weibo.conf
+
