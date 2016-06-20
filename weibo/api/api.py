@@ -14,14 +14,14 @@ CONF = cfg.CONF
 
 
 class useAPI(object):
-    def __init__(self, conf):
+    def __init__(self, conf, rm=False):
         self.app_key = conf.app_key
         self.app_secret = conf.app_secret
         self.callback_url = conf.callback_url
         self.token_file = conf.token_file
         self.token_file = os.path.join(os.path.dirname(__file__),
                                        self.token_file).replace('\\', '/')
-        if os.path.exists(self.token_file):
+        if os.path.exists(self.token_file) and rm:
             os.remove(self.token_file)
         self.checked = self.check()
 

@@ -40,14 +40,13 @@ class Userdata(Dbsave):
         self.api_key = CONF.api_key
 
         self.nicknames = []
-        self.get_userapi
+        self.get_userapi()
         self.get_all_names()
 
-    @property
-    def get_userapi(self):
+    def get_userapi(self, rm=False):
         if isinstance(self.api_key, list) and self.api_num < len(self.api_key):
             api_key = self.api_key[self.api_num]
-        self.userapi = api.useAPI(CONF[api_key])
+        self.userapi = api.useAPI(CONF[api_key], rm)
         self.api_num = self.api_num + 1
 
     def get_all_names(self):
@@ -66,7 +65,7 @@ class Userdata(Dbsave):
         try:
             result = self.userapi.get(url, **kwargs)
         except RuntimeError:
-            self.get_userapi
+            self.get_userapi(rm=True)
             result = self.userapi.get(url, **kwargs)
         return result
 
@@ -89,8 +88,8 @@ class Userdata(Dbsave):
         values['description'] = ushow.get('description')
         if isinstance(ucount, list):
             ucount = ucount[0]
-        values['friends_count'] = ushow.get('friends_count')
-        values['followers_count'] = ushow.get('followers_count')
+        values['friends_count'] = ucount.get('friends_count')
+        values['followers_count'] = ucount.get('followers_count')
         values['ability_tags'] = ushow.get('ability_tags')
         values['gender'] = ushow.get('gender')
         values['urank'] = ushow.get('urank')
