@@ -69,6 +69,19 @@ weibopc --config-file etc/weibo.conf
 获取用户信息
 ====
 ```
+1, 执行命令
+
+这个时候会出现 以下提示信息 并且会打开默认浏览器
+浏览器中的url 类似 http://127.0.0.1/?code=4a1291079a25335c12d0c39eef6c5a5b
+要复制 code 后的 信息 如: 4a1291079a25335c12d0c39eef6c5a5b
+然后在 粘贴 到 如下的提示信息中 然后 回车
+
+Please Input the Code: Created new window in existing browser session.
+4a1291079a25335c12d0c39eef6c5a5b
+
+
 weibapi --config-file etc/weibo.conf
+
+
 ```
 

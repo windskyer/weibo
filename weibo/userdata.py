@@ -114,8 +114,6 @@ class Userdata(Dbsave):
     def save_all_users(self):
         if isinstance(self.nicknames, list):
             for nickname in self.nicknames:
-                print(nickname)
-                import pdb;pdb.set_trace()
                 self.save_one_user(nickname)
         else:
             self.save_one_user(self.nicknames)
