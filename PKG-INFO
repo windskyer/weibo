@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: weibo
-Version: 2016.5.16
+Version: 2016.6.20
 summary = 'Climbed out of the weibo information for the specified user'
 home-page = 'https://github.com/windskyer/weibo'
 author = 'zwei'
