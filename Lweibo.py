@@ -641,7 +641,7 @@ if __name__ == '__main__':
     #ujson = api.get('statuses/show_batch', ids="3538755522")
     #ujson = api.get('users/show', screen_name="海涛法师")
     #print ujson.get('profile_url')
-    ujson = api.get('users/show', screen_name="张爱玲文记")
+    ujson = api.get('users/show', screen_name="圆善法师")
     #ujson = api.get('statuses/querymid', id=3538755522, type=2, is_batch=1)
     print(ujson)
     #ujson = api.get('users/counts', uids=1337970873)#    print(ujson)
