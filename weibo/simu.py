@@ -65,7 +65,6 @@ class Dbsave(object):
             return False
         return True
 
-
     # wbimg create
     def db_wbimg_create(self, values):
         return api.wbimg_create(values)
@@ -109,7 +108,7 @@ class Dbsave(object):
         return True
 
     # get mid  and is_zf and pa_mid from wbimg db
-    def db_wbimg_get_by_mid_and_zf(self,
+   def db_wbimg_get_by_mid_and_zf(self,
                                    mid,
                                    is_zf=False):
         try:
@@ -141,9 +140,6 @@ class Dbsave(object):
         except exception.ZfwbtextMidNotFound:
             return False
         return True
-
-
-
 
     # zfwbimg crate or update
     def db_zfwbimg_create_or_update(self, values):
@@ -180,6 +176,7 @@ class Dbsave(object):
     # save all data to db
     def save_all_data(self):
         pass
+
 
 class Simu(Dbsave):
     """ frist login weibo """
@@ -402,7 +399,6 @@ class Simu(Dbsave):
                 for url in urls:
                     zf_wbimg['url'] = url
                     self.db_zfwbimg_create_or_update(zf_wbimg)
-
 
     def save_wbimg(self, weibodata=None):
         wbimg = self.get_wbimg_data(weibodata)
