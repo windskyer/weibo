@@ -19,6 +19,7 @@ if os.path.exists(os.path.join(possible_topdir,
     sys.path.insert(0, possible_topdir)
 
 import weibo
+from weibo import download
 from weibo import simu
 from weibo import version
 from weibo import userdata
@@ -145,14 +146,21 @@ def login():
 def pweibo():
     config_file()
 
+
 def pmain():
     login()
+
 
 def amain():
     client()
 
+
 def dbmain():
     db_sync()
+
+
+def dnmain():
+    download.main()
 
 
 if __name__ == '__main__':

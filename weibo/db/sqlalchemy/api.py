@@ -116,7 +116,6 @@ def userdata_get_by_name(name, session=None):
             first()
     if not result:
         raise exception.UserdataNameNotFound(name=name)
-
     return result
 
 
