@@ -7,6 +7,9 @@
 import sys
 import six
 
+from weibo.common import log as logging
+
+LOG = logging.getLogger(__name__)
 
 class Error(Exception):
     """Base class for cfg exceptions."""
@@ -141,7 +144,7 @@ class UserdataIdNotFound(WeiboError):
 
 
 class UserdataNameNotFound(WeiboError):
-    msg_fmt = ("Userdata  name %(name)s not found exists.")
+    msg_fmt = ("Userdata  name %(screen_name)s not found exists.")
 
 
 class NotFoundChildrenTag(WeiboError):
@@ -155,4 +158,10 @@ class DetailNotFound(WeiboError):
 
 class NicknameNotNull(WeiboError):
     msg_fmt = ("nickname is Not null")
+
+class NotFoundImg(WeiboError):
+    msg_fmt = ("Not download %(url)s img to local disk")
+
+class ZfwbimgUidNotFound(WeiboError):
+    msg_fmt = ("ZfWbimg %(uid)s could not be found.")
 

@@ -1,8 +1,10 @@
 # --*-- coding: utf-8 --*--
+import urlparse
 
+from weibo import version
 from weibo import exception
-from weibo.db import api as db_api
 from weibo.api import api
+from weibo.db import api as db_api
 from weibo.common import cfg
 from weibo.common import log as logging
 
@@ -10,29 +12,7 @@ CONF = cfg.CONF
 LOG = logging.getLogger(__name__)
 
 
-class Dbsave(object):
-
-    def create_userdata(self, values):
-        db_api.userdata_create(values)
-
-    def update_userdata(self, values):
-        db_api.userdata_update(values)
-
-    def db_userdata_create_or_update(self, values):
-        if self.is_userdata_get_by_uid(values.get('uid')):
-            self.update_userdata(values)
-        else:
-            self.create_userdata(values)
-
-    def is_userdata_get_by_uid(sefl, uid):
-        try:
-            db_api.userdata_get_by_uid(uid)
-        except exception.UserdataUidNotFound:
-            return False
-        return True
-
-
-class Userdata(Dbsave):
+class Userdata(db_api.Dbsave):
     def __init__(self, ts=None):
         if not ts:
             self.ts = CONF.enable_multitargets
@@ -95,9 +75,15 @@ class Userdata(Dbsave):
         values['urank'] = ushow.get('urank')
         values['credit_score'] = ushow.get('credit_score')
         values['created_at'] = ushow.get('created_at')
-        values['homepage'] = ushow.get('homepage')
         values['profile_url'] = ushow.get('profile_url')
+        values['homepage'] = self.set_homepage(ushow.get('profile_url'))
         return values
+
+    def set_homepage(self, profile_url=None):
+        if not profile_url:
+            return
+        homepage = urlparse.urljoin(version.WEIBOWEB_HOME, profile_url)
+        return homepage
 
     def get_all_valuses(self, nickname):
         u1 = self.get_user_show(nickname)

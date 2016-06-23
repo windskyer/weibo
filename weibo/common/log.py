@@ -198,7 +198,7 @@ def _find_facility_from_conf():
 
 
 def _setup_logging_from_conf(product_name):
-    log_root = getLogger(product_name).logger
+    log_root = getLogger(None).logger
     for handler in log_root.handlers:
         log_root.removeHandler(handler)
 
@@ -221,7 +221,6 @@ def _setup_logging_from_conf(product_name):
     if CONF.use_stderr:
         streamlog = ColorHandler()
         log_root.addHandler(streamlog)
-
     elif not CONF.log_file:
         # pass sys.stdout as a positional argument
         # python2.6 calls the argument strm, in 2.7 it's stream
@@ -238,7 +237,6 @@ def _setup_logging_from_conf(product_name):
     if CONF.verbose or CONF.debug:
         log_root.setLevel(logging.DEBUG)
     else:
-        import pdb;pdb.set_trace()
         log_root.setLevel(logging.INFO)
 
 
@@ -337,8 +335,9 @@ class ColorHandler(logging.StreamHandler):
         return logging.StreamHandler.format(self, record)
 
 if __name__ == '__main__':
-    import pdb;pdb.set_trace()
     CONF('weibo.conf')
     setup('weibo')
+    LOG = getLogger("test function")
     LOG.info('fafadfafafffafa')
+    LOG.debug('fafadfafafffafa')
 

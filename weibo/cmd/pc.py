@@ -18,22 +18,24 @@ if os.path.exists(os.path.join(possible_topdir,
                                "__init__.py")):
     sys.path.insert(0, possible_topdir)
 
-import weibo
+from weibo import utils
+from weibo import service
+
 from weibo import download
 from weibo import simu
 from weibo import version
 from weibo import userdata
 from weibo import exception
-from weibo.api import api
 from weibo.db import migration
 from weibo.common import cfg
-from weibo.common import log
+from weibo.common.gettextutils import _
+from weibo.common import log as logging
 
 CONF = cfg.CONF
-import pdb;pdb
 dev_conf = os.path.join(possible_topdir,
                         'etc',
                         'weibo.conf')
+
 
 class ArgumentParser(argparse.ArgumentParser):
     def __init__(self, *args, **kwargs):
@@ -46,7 +48,7 @@ class ArgumentParser(argparse.ArgumentParser):
         exits.
         """
         self.print_usage(sys.stderr)
-        #FIXME(lzyeval): if changes occur in argparse.ArgParser._check_value
+        # FIXME(lzyeval): if changes occur in argparse.ArgParser._check_value
         choose_from = ' (choose from'
         progparts = self.prog.partition(' ')
         self.exit(2, "error: %(errmsg)s\nTry '%(mainp)s help %(subp)s'"
@@ -58,10 +60,10 @@ class ArgumentParser(argparse.ArgumentParser):
 
 def config_file(prog='weibo', description=None):
     _oparser = ArgumentParser(prog=prog,
-                               description=description,
-                               add_help=False,
-                               epilog='See "weibo help subcommand" '
-                               'for help on a specific command.',
+                              description=description,
+                              add_help=False,
+                              epilog='See "weibo help subcommand" '
+                              'for help on a specific command.',
                               )
     _oparser.add_argument('-h', '--help',
                           action='store_true',
@@ -70,7 +72,7 @@ def config_file(prog='weibo', description=None):
     _oparser.add_argument('-V', '--version',
                           action='version',
                           version=version.VERSION,
-                         )
+                          )
 
     _oparser.add_argument('-d', '--debug',
                           action='store_true',
@@ -81,17 +83,16 @@ def config_file(prog='weibo', description=None):
                           help='Path to a config file to use. Multiple config '
                           'files can be specified, with values in later '
                           'files taking precedence. The default files ',
-                         )
+                          )
     _oparser.add_argument('--config_file',
                           help=argparse.SUPPRESS,
-                         )
+                          )
     return _oparser.parse_args()
 
 args = config_file()
 
 if os.path.exists(dev_conf):
     CONF(dev_conf)
-    # LOG = logging.setup(*argv[:-1])
 else:
     if args.config_file:
         if os.path.exists(args.config_file):
@@ -100,6 +101,7 @@ else:
             CONF()
     else:
         CONF()
+logging.setup('weibo')
 
 
 def db_sync(version=None):
@@ -115,18 +117,13 @@ def db_version(self):
 def client():
     # API 参考 http://open.weibo.com/wiki/%E5%BE%AE%E5%8D%9AAPI
     # 使用参考 https://github.com/lxyu/weibo
-    #useapi = api.useAPI()
     udata = userdata.Userdata()
     udata.save_all_users()
-    #print(useapi.get('users/show', screen_name="海涛法师"))
-    # print(api.get('statuses/user_timeline'))
-    # print(api.get('statuses/user_timeline/ids'))
-    #print(useapi.get('statuses/queryid', mid="1035051413304027"))
-    # print(api.post('statuses/update', status='test from my api'))
 
 
 def login():
     # 首先登入
+    # import pdb;pdb.set_trace()
     simu.Simu.check_login()
 
     # 模拟登陆的功能扩展待完善
@@ -138,9 +135,7 @@ def login():
         simu.Simu.reset_login()
         simulogin = simu.Simu()
         simulogin.detail()
-
     simulogin.save_all_data()
-    # print(simulogin.detail('http://weibo.com/kaifulee'))
 
 
 def pweibo():
@@ -162,6 +157,37 @@ def dbmain():
 def dnmain():
     download.main()
 
+
+
+
+
+def pprint(t):
+    print('this sleep time %d' % t)
+
+
+class pstart(object):
+    def __init__(self):
+        self.invt = 2
+        self.timers = []
+
+    def start(self):
+        print('thsi start running')
+        timer = utils.LoopingCall(pprint, 2)
+        timer.start(self.invt)
+        self.timers.append(timer)
+
+    def wait(self):
+        for x in self.timers:
+            try:
+                x.wait()
+            except Exception:
+                pass
+
+def test():
+    pp = pstart()
+    #server = service.Service.create(binary='nova-compute')
+    service.serve(pp)
+    service.wait()
 
 if __name__ == '__main__':
     dbmain()

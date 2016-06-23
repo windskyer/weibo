@@ -9,35 +9,74 @@ from weibo.db.sqlalchemy import api
 class Dbsave(object):
 
     # userdata create
-    def create_userdata(self, values):
+    def db_userdata_create(self, values):
         api.userdata_create(values)
 
     # userdata update
-    def update_userdata(self, values):
+    def db_userdata_update(self, values):
         api.userdata_update(values)
 
     # userdata create or update
     def db_userdata_create_or_update(self, values):
         if self.is_userdata_get_by_uid(values.get('uid')):
-            self.update_userdata(values)
+            self.db_userdata_update(values)
         else:
-            self.create_userdata(values)
+            self.db_userdata_create(values)
 
     # is exists userdata by uid
-    def is_userdata_get_by_uid(sefl, uid):
+    def is_userdata_get_by_uid(self, uid):
         try:
             api.userdata_get_by_uid(uid)
         except exception.UserdataUidNotFound:
             return False
         return True
 
+    # get uid from userdata db
+    def db_userdata_get_by_uid(self, uid):
+        return api.userdata_get_by_uid(uid)
+
+    # is exists userdata by id
+    def is_userdata_get_by_id(self, id):
+        try:
+            api.userdata_get_by_id(id)
+        except exception.UserdataIdNotFound:
+            return False
+        return True
+
+    # get id from userdata db
+    def db_userdata_get_by_id(self, id):
+        return api.userdata_get_by_id(id)
+
+    # is exists userdata by name
+    def is_userdata_get_by_name(self, name):
+        try:
+            api.userdata_get_by_name(name)
+        except exception.UserdataNameNotFound:
+            return False
+        return True
+
     # get name from userdata db
     def db_userdata_get_by_name(self, name):
-        try:
-            values = api.userdata_get_by_name(name)
-        except exception.UserdataNameNotFound:
-            return
-        return values
+        return api.userdata_get_by_name(name)
+
+    # get all userdata by db
+    def db_userdata_get_all(self):
+        return api.userdata_get_all()
+
+    # delete userdata by id
+    def db_userdata_delete(self, id):
+        if self.is_userdata_get_by_id(id):
+            api.userdata_delete(id)
+
+    # delete userdata by uid
+    def db_userdata_delete_uid(self, uid):
+        if self.is_userdata_get_by_uid(uid):
+            api.userdata_delete_uid(uid)
+
+    # delete userdata by name
+    def db_userdata_delete_name(self, name):
+        if self.is_userdata_get_by_name(name):
+            api.userdata_delete_name(name)
 
     # weibo create
     def db_weibo_create(self, values):
@@ -97,25 +136,37 @@ class Dbsave(object):
 
     # wbimg crate or update
     def db_wbimg_create_or_update(self, values):
-        is_exist = self.db_is_wbimg_get_by_url(values['url'])
+        is_exist = self.is_wbimg_get_by_url(values['url'])
         if is_exist:
             self.db_wbimg_update(values)
         else:
             self.db_wbimg_create(values)
 
     # get url from weibo db
-    def db_is_wbimg_get_by_url(self, url):
+    def is_wbimg_get_by_url(self, url):
         try:
             api.wbimg_get_by_url(url)
         except exception.WbimgUrlNotFound:
             return False
         return True
 
+    # get url from weibo db
+    def db_wbimg_get_by_url(self, url):
+        return api.wbimg_get_by_url(url)
+
     # get mid from wbimg db
-    def db_is_wbimg_get_by_mid(self, mid):
+    def is_wbimg_get_by_mid(self, mid):
         try:
             api.wbimg_get_by_mid(mid)
         except exception.WbimgMidNotFound:
+            return False
+        return True
+
+    # is exists wbimg by uid
+    def is_wbimg_get_by_uid(self, uid):
+        try:
+            api.wbimg_get_by_uid(uid)
+        except exception.WbimgUidNotFound:
             return False
         return True
 
@@ -133,7 +184,7 @@ class Dbsave(object):
 
     # zfwbtext crate or update
     def db_zfwbtext_create_or_update(self, values):
-        is_exist = self.db_is_zfwbtext_get_by_mid(values['mid'])
+        is_exist = self.is_zfwbtext_get_by_mid(values['mid'])
         if is_exist:
             self.db_zfwbtext_update(values)
         else:
@@ -148,7 +199,7 @@ class Dbsave(object):
         return api.zfwbtext_update(values)
 
     # get mid from zfwbtext db
-    def db_is_zfwbtext_get_by_mid(self, mid):
+    def is_zfwbtext_get_by_mid(self, mid):
         try:
             api.zfwbtext_get_by_mid(mid)
         except exception.ZfwbtextMidNotFound:
@@ -158,7 +209,7 @@ class Dbsave(object):
     #  ----- option all zfwbimg start ----- #
     # zfwbimg crate or update
     def db_zfwbimg_create_or_update(self, values):
-        is_exist = self.db_is_zfwbimg_get_by_url(values['url'])
+        is_exist = self.is_zfwbimg_get_by_url(values['url'])
         if is_exist:
             self.db_zfwbimg_update(values)
         else:
@@ -172,8 +223,20 @@ class Dbsave(object):
     def db_zfwbimg_update(self, values):
         return api.zfwbimg_update(values)
 
+    # get uid from zfwbimg db
+    def is_zfwbimg_get_by_uid(self, uid):
+        try:
+            api.zfwbimg_get_by_uid(uid)
+        except exception.ZfwbimgUidNotFound:
+            return False
+        return True
+
+    # get uid from zfwbimg db
+    def db_zfwbimg_get_by_uid(self, uid):
+        return api.zfwbimg_get_by_uid(uid)
+
     # get mid from zfwbimg db
-    def db_is_zfwbimg_get_by_mid(self, mid):
+    def is_zfwbimg_get_by_mid(self, mid):
         try:
             api.zfwbimg_get_by_mid(mid)
         except exception.ZfwbimgMidNotFound:
@@ -181,7 +244,7 @@ class Dbsave(object):
         return True
 
     # get url from zfwbimg db by url
-    def db_is_zfwbimg_get_by_url(self, url):
+    def is_zfwbimg_get_by_url(self, url):
         try:
             api.zfwbimg_get_by_url(url)
         except exception.ZfwbimgUrlNotFound:

@@ -131,6 +131,9 @@ class Userdata(BASE, WeiboBase):
     # 主页地址
     profile_url = Column(String(150))
 
+    # 微博主页地址
+    homepage = Column(String(150))
+
 class Weibo(BASE, WeiboBase):
     __tablename__ = 'weibo'
     # 微博id
@@ -159,6 +162,9 @@ class Weibo(BASE, WeiboBase):
 
     # 发布时间
     time_at = Column(String(150))
+
+    # 发布来源
+    source = Column(String(150))
 
 class Zfwbimg(BASE, WeiboBase):
     __tablename__ = 'zfwbimg'

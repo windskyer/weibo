@@ -23,9 +23,10 @@ except Exception:
 
 from weibo import exception
 from weibo.common import cfg
-from weibo.common import log
+from weibo.common import log as logging
 
 CONF = cfg.CONF
+LOG = logging.getLogger(__name__)
 
 
 class BaseLogin(object):
@@ -100,7 +101,7 @@ class Login(BaseLogin):
             rsakv = data['rsakv']
             return servertime, nonce, rsakv
         except:
-            print('Getting prelogin status met error!')
+            LOG.info('Getting prelogin status met error!')
             return None
 
     def login(self, username, pwd, cookie_file):
@@ -117,7 +118,7 @@ class Login(BaseLogin):
                 loaded = 1
             except cookielib.LoadError:
                 loaded = 0
-                print('Loading cookies error')
+                LOG.info('Loading cookies error')
 
             # install loaded cookies for urllib2
             if loaded:
@@ -125,7 +126,7 @@ class Login(BaseLogin):
                 opener = urllib2.build_opener(cookie_support,
                                               urllib2.HTTPHandler)
                 urllib2.install_opener(opener)
-                print('Loading cookies success')
+                LOG.info('Loading cookies success')
                 return 1
             else:
                 return self.do_login(username, pwd, cookie_file)
@@ -179,7 +180,7 @@ class Login(BaseLogin):
             return
 
         # Fill POST data
-        print('starting to set login_data')
+        LOG.info('starting to set login_data')
         login_data['servertime'] = servertime
         login_data['nonce'] = nonce
         login_data['su'] = self.get_user(username)

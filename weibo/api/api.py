@@ -7,10 +7,13 @@ except:
 
 
 from weibo.common import cfg
+from weibo.common import log as logging
 from weibo.api.client import Client
 
 
 CONF = cfg.CONF
+LOG = logging.getLogger(__name__)
+TMP_TOKEN = '/tmp/token.pkl'
 
 
 class useAPI(object):
@@ -19,8 +22,8 @@ class useAPI(object):
         self.app_secret = conf.app_secret
         self.callback_url = conf.callback_url
         self.token_file = conf.token_file
-        self.token_file = os.path.join(os.path.dirname(__file__),
-                                       self.token_file).replace('\\', '/')
+        if not self.token_file:
+            self.token_file = TMP_TOKEN
         if os.path.exists(self.token_file) and rm:
             os.remove(self.token_file)
         self.checked = self.check()
@@ -37,9 +40,9 @@ class useAPI(object):
                     self.api = api
                     return True
                 except:
-                    print("token maybe out of time!")
+                    LOG.error("token maybe out of time!")
             except:
-                print("The token file error")
+                LOG.error("The token file error")
         return False
 
     def token(self, CODE=''):
@@ -56,7 +59,7 @@ class useAPI(object):
             try:
                 client.set_code(CODE)
             except:
-                print("Maybe wrong CODE")
+                LOG.error("Maybe wrong CODE")
                 return
         token = client.token
         pkl.dump(token, open(str(self.token_file), 'wb'))

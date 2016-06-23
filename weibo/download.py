@@ -28,13 +28,17 @@ class Download(object):
                 self.urls = url
             else:
                 raise exception.UrlsNotUser(urls=self.urls)
-        self.image_dir = CONF.image_dir or self.imagedir
+        self.image_dir = CONF.image_dir or self.imagedir()
         self.ts = CONF.enable_multitargets
 
-    @property
-    def imagedir(self):
-        imagedir = os.path.join(os.path.dirname(__file__),
-                                'image')
+    def imagedir(self, name=None):
+        if not name:
+            imagedir = os.path.join(os.path.dirname(__file__),
+                                    'image')
+        else:
+            imagedir = os.path.join(os.path.dirname(__file__),
+                                    'image',
+                                    name[1:])
         imagedir = os.path.abspath(imagedir)
         if not os.path.exists(imagedir):
             os.mkdir(imagedir, 0o777)
@@ -48,25 +52,36 @@ class Download(object):
 
     def get_img(self, url):
         try:
-            name = urlparse.urlsplit(url).path
             conn = urllib2.urlopen(url)
         except:
             raise exception.NotFoundImg(url=url)
-        return (conn, name)
+        return conn
 
-    def save_img(self, conn, name):
-        img_file = self.image_dir + name
-        with open(img_file, 'wb') as fp:
+    def get_imgfile(self, url):
+        name = urlparse.urlsplit(url).path
+        path, imgfile = os.path.split(name)
+        if imgfile:
+            if CONF.image_dir:
+                img_file = CONF.image_dir
+            else:
+                img_file = self.imagedir(path)
+        imgfile = os.path.join(img_file, imgfile)
+        return imgfile
+
+    def save_img(self, conn, imgfile):
+        with open(imgfile, 'wb') as fp:
             fp.write(conn.read())
 
 
 class ImageDl(Download):
 
     def __init__(self, nickname=None):
+        super(ImageDl, self).__init__()
         self.nickname = nickname
         self.names = []
         self.uids = []
-        super(ImageDl, self).__init__()
+        self.db_update = {}
+        self.urls = {}
 
     @property
     def get_all_uid(self):
@@ -77,29 +92,75 @@ class ImageDl(Download):
             if userdata:
                 self.uids.append(userdata.get('uid', None))
 
+    @property
+    def get_db_all_uid(self):
+        values = db_api.db_userdata_get_all()
+        for value in values:
+            self.names.append(value.screen_name)
+            self.uids.append(value.uid)
+
     def get_all_img_urls(self, uid):
-        imgs = db_api.db_wbimg_get_by_uid(uid)
-        for img in imgs:
-            url = img.get('url', None)
-            if not url:
-                continue
-            self.urls.extend(url)
+        urls = []
+        if db_api.is_wbimg_get_by_uid(uid):
+            imgs = db_api.db_wbimg_get_by_uid(uid)
+            for img in imgs:
+                url = img.get('url', None)
+                if not url:
+                    continue
+                urls.append(url)
+        self.urls.setdefault('wb', urls)
 
     def get_all_zfimg_urls(self, uid):
-        zfimgs = db_api.db_zfwbimg_get_by_uid(uid)
-        for zfimg in zfimgs:
-            url = zfimg.get('url', None)
-            if not url:
-                continue
-            self.urls.extend(url)
+        urls = []
+        if db_api.is_zfwbimg_get_by_uid(uid):
+            zfimgs = db_api.db_zfwbimg_get_by_uid(uid)
+            for zfimg in zfimgs:
+                url = zfimg.get('url', None)
+                if not url:
+                    continue
+                urls.append(url)
+        self.urls.setdefault('zfwb', urls)
+
+    def exists_img(self, url):
+        is_exists = False
+        imgfile = self.get_imgfile(url)
+        if os.path.exists(imgfile):
+            is_exists = True
+        return is_exists, imgfile
 
     def download(self):
-        self.get_all_uid
+        self.get_db_all_uid
         for uid in self.uids:
             self.get_all_img_urls(uid)
-        for url in self.urls:
-            conn, name = self.get_img(url)
-            self.save_img(conn, name)
+            self.get_all_zfimg_urls(uid)
+        for k, v in self.urls.items():
+            for url in v:
+                is_exists, imgfile = self.exists_img(url)
+                if is_exists:
+                    if k == 'zfwb':
+                        self.update_to_db(url, imgfile, True)
+                    if k == 'wb':
+                        self.update_to_db(url, imgfile, False)
+                    continue
+                try:
+                    conn = self.get_img(url)
+                except exception.NotFoundImg:
+                    continue
+                else:
+                    self.save_img(conn, imgfile)
+                    if k == 'zfwb':
+                        self.update_to_db(url, imgfile, True)
+                    if k == 'wb':
+                        self.update_to_db(url, imgfile, False)
+
+    def update_to_db(self, url, location, iszf=False):
+        if not iszf:
+            img = db_api.db_wbimg_get_by_url(url)
+        else:
+            img = db_api.db_zfwbimg_get_by_url(url)
+        img.location = location
+        img.save()
+
 
 
 class VideosDl(Download):

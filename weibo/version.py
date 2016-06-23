@@ -11,3 +11,4 @@ WEIBO_PACKAGE = None  # OS distro weibo version suffix
 loaded = False
 version_info = pbr_version.VersionInfo('weibo')
 version_string = version_info.version_string
+WEIBOWEB_HOME='http://weibo.com'

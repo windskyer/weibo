@@ -1,8 +1,8 @@
-# --*-- conding: utf-8 --*--
+# --*-- coding: utf-8 --*--
 # Copyright (c) 2016
 
 import os
-# import eventlet
+import eventlet
 
 from weibo import exception
 from weibo.db.api import Dbsave
@@ -40,14 +40,15 @@ class Simu(Dbsave):
     @property
     def get_urls_name(self):
         targets = CONF.enable_multitargets
-        t_url = {}
         if isinstance(targets, list):
             for target in targets:
+                t_url = {}
                 t_url['nickname'] = CONF[target].nickname
                 t_url['url'] = CONF[target].url
                 self.targets.append(t_url)
 
         if isinstance(targets, str):
+            t_url = {}
             t_url['nickname'] = CONF[targets].nickname
             t_url['url'] = CONF[targets].url
             self.targets.append(t_url)
@@ -89,7 +90,7 @@ class Simu(Dbsave):
 
         cls.set_env()
         if not os.path.exists(cls.cookie_file):
-            print("weibo login is reset")
+            LOG.info("weibo login is reset")
             cls.pre_weibo_login()
         return 0
 
@@ -97,7 +98,7 @@ class Simu(Dbsave):
     def check_login(cls):
         cls.set_env()
         if not os.path.exists(cls.cookie_file):
-            print("weibo login is reset")
+            LOG.info("weibo login is reset")
             cls.pre_weibo_login()
         return 0
 
@@ -115,15 +116,20 @@ class Simu(Dbsave):
             url = self.urls
 
         if isinstance(url, str):
-            nickname = self.get_nickname(url)
-            self.weibodata[nickname] = self._detail(url)
+            url = [url]
 
         if isinstance(url, list):
             for u in url:
                 nickname = self.get_nickname(u)
                 self.weibodata[nickname] = self._detail(u)
+                LOG.info('Get %(nickname)s user weibo info url is %(url)s',
+                         {'nickname': nickname, 'url': u})
 
         return self.weibodata
+
+    # 使用多线成对一个 大号处理
+    def _eventlet_one_url(self, url):
+        pass
 
     def _detail(self, url=None):
         if url:

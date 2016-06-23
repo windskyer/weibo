@@ -7,13 +7,14 @@ Parse html file
 '''
 import re
 import six
-import json
-import datetime
 import urlparse
 from bs4.element import Tag
 from bs4 import BeautifulSoup
 
 from weibo import exception
+from weibo.common import log as logging
+
+LOG = logging.getLogger(__name__)
 
 
 class HBeautifulSoup(BeautifulSoup):
@@ -50,10 +51,10 @@ class ZDetail(object):
     def __init__(self, z_jx, jdetail):
         self.z_jx = z_jx
         self.jx = jdetail
-        self._get_wb_mid_date()
-        self._get_wb_uid_name()
 
     def get_wb_text(self, zf=True):
+        self._get_wb_mid_date()
+        self._get_wb_uid_name()
         return self.jx.get_wb_text(self.z_jx, zf)
 
     def get_wb_img(self, zf=True):
@@ -79,6 +80,7 @@ class ZDetail(object):
 
     def get_wb_name(self, zf=True):
         return self.jx.get_wb_name(self.z_jx, zf)
+
 
 class JDetail(object):
     '''
@@ -116,13 +118,22 @@ class JDetail(object):
     def is_zf_wb(self):
         div_attrs = {'class': 'WB_feed_expand'}
         z_jx = self.jx.findChild(name='div', attrs=div_attrs)
-        if z_jx:
+        if z_jx and not self.is_zf_wb_and_delete(z_jx):
             self.is_zf = True
             self.get_zf_wb(z_jx)
         else:
             self.is_zf = False
 
         return self.is_zf
+
+    # 是转发微博 但是 转发被删除
+    def is_zf_wb_and_delete(self, z_jx):
+        div_attrs = {'class': 'WB_empty'}
+        try:
+            self._get_children_tag(z_jx, name='div', attrs=div_attrs)
+        except exception.NotFoundChildrenTag:
+            return False
+        return True
 
     def get_zf_wb(self, z_jx=None):
         if not isinstance(z_jx, Tag):
@@ -150,7 +161,6 @@ class JDetail(object):
 
     # 获取 微博的uid, name 等
     def _get_wb_uid_name(self, jx=None, zf=False):
-        #import pdb;pdb.set_trace()
         self.wb_uid_name = {}
         if not jx:
             jx = self.jx
@@ -168,8 +178,8 @@ class JDetail(object):
             usercard = dict(usercard)
             uid = usercard.get('id', None)
 
-            self.wb_uid_name.setdefault('name', name)
-            self.wb_uid_name.setdefault('uid', uid)
+            self.wb_uid_name['name'] = name
+            self.wb_uid_name['uid'] = uid
         else:
             div_attrs = {'class': 'WB_info'}
             uidname_div = self._get_children_tag(jx,
@@ -181,10 +191,10 @@ class JDetail(object):
             usercard = urlparse.parse_qsl(usercard)
             usercard = dict(usercard)
             uid = usercard.get('id', None)
-            self.wb_uid_name.setdefault('uid', uid)
+            self.wb_uid_name['uid'] = uid
 
             nickname = a_first.attrs.get('nick-name', None)
-            self.wb_uid_name.setdefault('name', nickname)
+            self.wb_uid_name['name'] = nickname
 
             midstr = a_first.attrs.get('suda-uatrack', None)
             midstr = urlparse.parse_qsl(midstr)
@@ -194,9 +204,8 @@ class JDetail(object):
             mid = midstr[midnum:]
 
             time_at = '0'
-            self.wb_mid_date.setdefault('mid', mid)
-            self.wb_mid_date.setdefault('time_at', time_at)
-
+            self.wb_mid_date['mid'] = mid
+            self.wb_mid_date['time_at'] = time_at
 
     # 获取 微博的mid, time_at 等
     def _get_wb_mid_date(self, jx=None, zf=False):
@@ -212,8 +221,8 @@ class JDetail(object):
                                              name='a')
             mid = a_first.attrs.get('name', None)
             time_at = a_first.attrs.get('date', '0')
-            self.wb_mid_date.setdefault('mid', mid)
-            self.wb_mid_date.setdefault('time_at', time_at)
+            self.wb_mid_date['mid'] = mid
+            self.wb_mid_date['time_at'] = time_at
         else:
             self._get_wb_uid_name(jx, zf)
 
@@ -469,7 +478,6 @@ class Jhtml(object):
 
     def wb_img(self, WB=None, zf=False):
         # 图片
-        # import pdb;pdb.set_trace()
         if zf:
             img = self.jdetail.z_jx.get_wb_img()
         else:
@@ -512,7 +520,7 @@ class Jhtml(object):
 
     def wb_time(self, WB, zf=False):
         # weibo 发布时间
-        #WB_timestamp = re.findall(r'date=\\"([^"]*)\\"', WB)[-1]
+        # WB_timestamp = re.findall(r'date=\\"([^"]*)\\"', WB)[-1]
         # checked
         if not zf:
             WB_timestamp = self.jdetail.get_wb_date()
@@ -522,7 +530,7 @@ class Jhtml(object):
 
     def wb_mid(self, WB, zf=False):
         # 获取微博id
-        #WB_mid = re.findall(r'mid=.*?(\d*)', WB)[-1]
+        # WB_mid = re.findall(r'mid=.*?(\d*)', WB)[-1]
         # checked
         if not zf:
             WB_mid = self.jdetail.get_wb_mid()
@@ -540,7 +548,7 @@ class Jhtml(object):
     def wb_name(self, WB, zf=False):
         # 微博作者的用户信息字段
         if not zf:
-            #WB_name = ''.join(re.findall(r'nick-name=\\"([^"]*)\\"', WB))
+            # WB_name = ''.join(re.findall(r'nick-name=\\"([^"]*)\\"', WB))
             WB_name = self.jdetail.get_wb_name()
         else:
             WB_name = self.jdetail.z_jx.get_wb_name()
@@ -549,7 +557,7 @@ class Jhtml(object):
     def wb_uid(self, WB, zf=False):
         # 微博的作者id
         if not zf:
-            #WB_uid = ''.join(re.findall(r'fuid=([^"]*)\\"', WB))
+            # WB_uid = ''.join(re.findall(r'fuid=([^"]*)\\"', WB))
             WB_uid = self.jdetail.get_wb_uid()
             # checked
         else:
@@ -573,7 +581,7 @@ class Jhtml(object):
     def wb_all_jiexi2(self, wb_detail):
         for wb in wb_detail:
             # 初始化wb 信息
-            #import pdb;pdb.set_trace()
+            # import pdb;pdb.set_trace()
             self.wb(wb)
             is_zf = self.is_zf_wb()
             wb_info = self.get_wb_info(wb, False)

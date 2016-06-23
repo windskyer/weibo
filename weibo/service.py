@@ -12,6 +12,7 @@ import eventlet
 import greenlet
 
 from weibo.common import cfg
+from weibo.common.gettextutils import _
 from weibo.common import log as logging
 
 CONF = cfg.CONF
@@ -32,7 +33,7 @@ class Launcher(object):
 
         """
         self._services = []
-        eventlet_backdoor.initialize_if_enabled()
+        # eventlet_backdoor.initialize_if_enabled()
 
     @staticmethod
     def run_server(server):
@@ -143,8 +144,43 @@ class ProcessLauncher(object):
         sys.exit(1)
 
 
+class Service(object):
+    """Service object for binaries running on hosts.
+
+    A service takes a manager and enables rpc by listening to queues based
+    on topic. It also periodically runs tasks on the manager and reports
+    it state to the database services table."""
+
+    def __init__(self, host, binary, topic, manager, report_interval=None,
+                 periodic_interval=None, periodic_fuzzy_delay=None,
+                 *args, **kwargs):
+        self.timers = []
 
 
+    def start(self):
+        version_string = version.version_string()
+        LOG.audit(_('Starting %(topic)s node (version %(version_string)s)'),
+                  {'topic': self.topic, 'version_string': version_string})
+        self.manager.init_host()
+        self.model_disconnected = False
+        ctxt = context.get_admin_context()
+        try:
+            service_ref = db.service_get_by_args(ctxt,
+                                                 self.host,
+                                                 self.binary)
+            self.service_id = service_ref['id']
+        except exception.NotFound:
+            self._create_service_ref(ctxt)
+
+        self.conn = rpc.create_connection(new=True)
+        LOG.debug(_("Creating Consumer connection for Service %s") %
+                  self.topic)
+
+                if self.report_interval:
+            pulse = utils.LoopingCall(self.report_state)
+            pulse.start(interval=self.report_interval,
+                        initial_delay=self.report_interval)
+            self.timers.append(pulse)
 
 
 

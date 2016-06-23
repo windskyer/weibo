@@ -3,7 +3,6 @@
 # email: suifeng20@hotmail.com
 
 
-from weibo import db
 from weibo import exception
 from weibo.db.sqlalchemy import models
 from weibo.db.sqlalchemy.session import get_session
@@ -43,7 +42,7 @@ def model_query(model, *args, **kwargs):
 
 
 def _get_query(model_class, id_field=None, id=None,
-                        session=None, read_deleted=None):
+               session=None, read_deleted=None):
     query = model_query(model_class, session=session,
                         read_deleted=read_deleted)
 
@@ -56,10 +55,10 @@ def _get_query(model_class, id_field=None, id=None,
 def userdata_create(values):
     session = get_session()
     userdata = _get_query(models.Userdata,
-                                   models.Userdata.uid,
-                                   values['uid'],
-                                   session=session,
-                                   read_deleted='no').first()
+                          models.Userdata.uid,
+                          values['uid'],
+                          session=session,
+                          read_deleted='no').first()
     if not userdata:
         userdata = models.Userdata()
         userdata.update(values)
@@ -91,31 +90,31 @@ def userdata_get_all(session=None):
 
 def userdata_delete(id):
     session = get_session()
-    userdata = userdata_get_by_id(id)
+    userdata = userdata_get_by_id(id, session)
     if userdata:
         userdata.delete()
 
 
 def userdata_delete_uid(uid):
     session = get_session()
-    userdata = userdata_get_by_uid(uid)
+    userdata = userdata_get_by_uid(uid, session)
     if userdata:
         userdata.delete()
 
 
 def userdata_delete_name(name):
     session = get_session()
-    userdata = userdata_get_by_name(name)
+    userdata = userdata_get_by_name(name, session)
     if userdata:
         userdata.delete()
 
 
 def userdata_get_by_name(name, session=None):
     result = model_query(models.Userdata, session=session).\
-            filter_by(name=name).\
-            first()
+        filter_by(screen_name=name).\
+        first()
     if not result:
-        raise exception.UserdataNameNotFound(name=name)
+        raise exception.UserdataNameNotFound(screen_name=name)
     return result
 
 
@@ -139,6 +138,7 @@ def userdata_get_by_uid(uid, session=None):
     return result
 
 
+# ----all options weibo -----#
 def weibo_create(values, session=None):
     if not session:
         session = get_session()
@@ -154,7 +154,7 @@ def weibo_create(values, session=None):
         weibo.update(values)
         weibo.save(session=session)
     else:
-        raise exception.WeiboMidExists(mid=mid)
+        raise exception.WeiboMidExists(mid=values['mid'])
 
     return weibo_get_by_mid(weibo.mid)
 
@@ -194,7 +194,7 @@ def weibo_delete_uid(uid, session=None):
         session = get_session()
 
     weibos = weibo_get_by_uid(uid)
-    if weibo in weibos:
+    for weibo in weibos:
         weibo.delete()
 
 
@@ -203,7 +203,7 @@ def weibo_get_by_id(id, session=None):
                      filter_by(id=id).\
                      first()
     if not result:
-        raise exception.WeiboIdNotFound(mid=mid)
+        raise exception.WeiboIdNotFound(id=id)
 
     return result
 
@@ -240,17 +240,17 @@ def wbtext_create(values, session=None):
         session = get_session()
 
     wbtext = _get_query(models.Wbtext,
-                       models.Wbtext.mid,
-                       values['mid'],
-                       session=session,
-                       read_deleted='no').first()
+                        models.Wbtext.mid,
+                        values['mid'],
+                        session=session,
+                        read_deleted='no').first()
 
     if not wbtext:
         wbtext = models.Wbtext()
         wbtext.update(values)
         wbtext.save(session=session)
     else:
-        raise exception.WbtextMidExists(mid=mid)
+        raise exception.WbtextMidExists(mid=values['mid'])
 
     return wbtext_get_by_mid(wbtext.mid)
 
@@ -271,7 +271,7 @@ def wbtext_delete(id, session=None):
     if not session:
         session = get_session()
 
-    wtext = wbtext_get_by_id(id)
+    wbtext = wbtext_get_by_id(id)
     if wbtext:
         wbtext.delete()
 
@@ -290,7 +290,7 @@ def wbtext_delete_uid(uid, session=None):
         session = get_session()
 
     wbtexts = wbtext_get_by_uid(uid)
-    if wbtext in wbtexts:
+    for wbtext in wbtexts:
         wbtext.delete()
 
 
@@ -323,6 +323,7 @@ def wbtext_get_by_uid(uid, session=None):
 
     return result
 
+
 def wbtext_get_by_mid_and_zf(mid, is_zf=False, session=None):
     result = model_query(models.Wbtext, session=session).\
                      filter_by(mid=mid).\
@@ -334,6 +335,7 @@ def wbtext_get_by_mid_and_zf(mid, is_zf=False, session=None):
                                                is_zf=is_zf)
 
     return result
+
 
 # wbimg table options
 def wbimg_create(values, session=None):
@@ -392,8 +394,9 @@ def wbimg_delete_uid(uid, session=None):
         session = get_session()
 
     wbimgs = wbimg_get_by_uid(uid)
-    if wbimg in wbimgs:
+    for wbimg in wbimgs:
         wbimg.delete()
+
 
 def wbimg_get_by_url(url, session=None):
     result = model_query(models.Wbimg, session=session).\
@@ -426,6 +429,7 @@ def wbimg_get_by_mid_and_zf(mid, is_zf=False, session=None):
 
     return result
 
+
 def wbimg_get_by_uid(uid, session=None):
     result = model_query(models.Wbimg, session=session).\
                      filter_by(uid=uid).\
@@ -435,16 +439,15 @@ def wbimg_get_by_uid(uid, session=None):
 
     return result
 
+
 def wbimg_get_by_mid(mid, session=None):
     result = model_query(models.Wbimg, session=session).\
                      filter_by(mid=mid).\
                      all()
     if not result:
-        raise exception.WbimgMidNotFound(uid=uid)
+        raise exception.WbimgMidNotFound(mid=mid)
 
     return result
-
-
 
 
 # zfwbimg table options
@@ -454,10 +457,10 @@ def zfwbimg_create(values, session=None):
 
     url = values['url']
     zfwbimg = _get_query(models.Zfwbimg,
-                       models.Zfwbimg.url,
-                       url,
-                       session=session,
-                       read_deleted='no').first()
+                         models.Zfwbimg.url,
+                         url,
+                         session=session,
+                         read_deleted='no').first()
 
     if not zfwbimg:
         zfwbimg = models.Zfwbimg()
@@ -504,8 +507,9 @@ def zfwbimg_delete_uid(uid, session=None):
         session = get_session()
 
     zfwbimgs = zfwbimg_get_by_uid(uid)
-    if zfwbimg in zfwbimgs:
+    for zfwbimg in zfwbimgs:
         zfwbimg.delete()
+
 
 def zfwbimg_get_by_url(url, session=None):
     result = model_query(models.Zfwbimg, session=session).\
@@ -534,18 +538,20 @@ def zfwbimg_get_by_mid_and_zf(mid, is_zf=False, session=None):
                      first()
     if not result:
         raise exception.ZfwbimgMidAndZfNotFound(mid=mid,
-                                              is_zf=is_zf)
+                                                is_zf=is_zf)
 
     return result
 
+
 def zfwbimg_get_by_uid(uid, session=None):
-    result = model_query(models.Wbimg, session=session).\
+    result = model_query(models.Zfwbimg, session=session).\
                      filter_by(uid=uid).\
                      all()
     if not result:
         raise exception.ZfwbimgUidNotFound(uid=uid)
 
     return result
+
 
 def zfwbimg_get_by_mid(mid, session=None):
     result = model_query(models.Zfwbimg, session=session).\
@@ -563,17 +569,17 @@ def zfwbtext_create(values, session=None):
         session = get_session()
 
     zfwbtext = _get_query(models.Zfwbtext,
-                       models.Zfwbtext.mid,
-                       values['mid'],
-                       session=session,
-                       read_deleted='no').first()
+                          models.Zfwbtext.mid,
+                          values['mid'],
+                          session=session,
+                          read_deleted='no').first()
 
     if not zfwbtext:
         zfwbtext = models.Zfwbtext()
         zfwbtext.update(values)
         zfwbtext.save(session=session)
     else:
-        raise exception.ZfwbtextMidExists(mid=mid)
+        raise exception.ZfwbtextMidExists(mid=values['mid'])
 
     return zfwbtext_get_by_mid(zfwbtext.mid)
 
@@ -594,8 +600,8 @@ def zfwbtext_delete(id, session=None):
     if not session:
         session = get_session()
 
-    zfwtext = zfwbtext_get_by_id(id)
-    if zfwbtext:
+    zfwbtexts = zfwbtext_get_by_id(id)
+    for zfwbtext in zfwbtexts:
         zfwbtext.delete()
 
 
@@ -613,7 +619,7 @@ def zfwbtext_delete_uid(uid, session=None):
         session = get_session()
 
     zfwbtexts = zfwbtext_get_by_uid(uid)
-    if zfwbtext in zfwbtexts:
+    for zfwbtext in zfwbtexts:
         zfwbtext.delete()
 
 
@@ -646,6 +652,7 @@ def zfwbtext_get_by_uid(uid, session=None):
 
     return result
 
+
 def zfwbtext_get_by_mid_and_zf(mid, is_zf=False, session=None):
     result = model_query(models.Zfwbtext, session=session).\
                      filter_by(mid=mid).\
@@ -654,7 +661,7 @@ def zfwbtext_get_by_mid_and_zf(mid, is_zf=False, session=None):
 
     if not result:
         raise exception.zfwbtextMidAndZfNotFound(mid=mid,
-                                               is_zf=is_zf)
+                                                 is_zf=is_zf)
 
     return result
 

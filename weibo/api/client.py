@@ -5,6 +5,7 @@ import requests
 
 """ Client api """
 
+
 class Client(object):
     """Python sina weibo sdk.
 
