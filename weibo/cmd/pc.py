@@ -18,15 +18,14 @@ if os.path.exists(os.path.join(possible_topdir,
                                "__init__.py")):
     sys.path.insert(0, possible_topdir)
 
-from weibo import utils
 from weibo import service
-
-from weibo import download
 from weibo import simu
 from weibo import version
+from weibo import download
 from weibo import userdata
 from weibo import exception
 from weibo.db import migration
+from weibo.db import api as session
 from weibo.common import cfg
 from weibo.common.gettextutils import _
 from weibo.common import log as logging
@@ -101,7 +100,7 @@ else:
             CONF()
     else:
         CONF()
-logging.setup('weibo')
+#logging.setup('weibo')
 
 
 def db_sync(version=None):
@@ -158,36 +157,40 @@ def dnmain():
     download.main()
 
 
-
-
-
-def pprint(t):
-    print('this sleep time %d' % t)
-
-
-class pstart(object):
-    def __init__(self):
-        self.invt = 2
-        self.timers = []
-
-    def start(self):
-        print('thsi start running')
-        timer = utils.LoopingCall(pprint, 2)
-        timer.start(self.invt)
-        self.timers.append(timer)
-
-    def wait(self):
-        for x in self.timers:
-            try:
-                x.wait()
-            except Exception:
-                pass
-
 def test():
-    pp = pstart()
-    #server = service.Service.create(binary='nova-compute')
-    service.serve(pp)
-    service.wait()
+    launcher = service.get_launcher()
+    LOG = logging.getLogger(__name__)
+    service_started = False
+
+    if isinstance(CONF.enable_multiusers, list):
+        for backend in CONF.enable_multiusers:
+            backend_host = getattr(CONF, backend).backend_host
+            host = "%s@%s" % (backend_host or CONF.host, backend)
+            try:
+                server = service.Service.create(host=host,
+                                                service_name=backend,
+                                                binary='weibo')
+            except Exception:
+                msg = _('weibo service %s failed to start.') % host
+                LOG.exception(msg)
+            else:
+                # Dispose of the whole DB connection pool here before
+                # starting another process.  Otherwise we run into cases where
+                # child processes share DB connections which results in errors.
+                session.dispose_engine()
+                launcher.launch_service(server)
+                service_started = True
+    else:
+        server = service.Service.create(binary='weibo')
+        launcher.launch_service(server)
+        service_started = True
+
+    if not service_started:
+        msg = _('No volume service(s) started successfully, terminating.')
+        LOG.error(msg)
+        sys.exit(1)
+
+    launcher.wait()
 
 if __name__ == '__main__':
     dbmain()

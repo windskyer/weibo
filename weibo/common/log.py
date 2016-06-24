@@ -1,5 +1,5 @@
-#author zwei
-#email suifeng20@hotmail.com
+# author zwei
+# email suifeng20@hotmail.com
 
 import cStringIO
 import inspect
@@ -12,8 +12,10 @@ import stat
 import sys
 import traceback
 
+
 from weibo.common import cfg
 from weibo.common import local
+from weibo.common import jsonutils
 from weibo.common.gettextutils import _
 
 CONF = cfg.CONF
@@ -22,7 +24,9 @@ CONF = cfg.CONF
 # NOTE(jkoelker) Since we synthesized an audit level, make the logging
 #                module aware of it so it acts like other levels.
 logging.AUDIT = logging.INFO + 1
+logging.TRACE = 5
 logging.addLevelName(logging.AUDIT, 'AUDIT')
+logging.addLevelName(logging.TRACE, 'TRACE')
 
 try:
     NullHandler = logging.NullHandler
@@ -75,6 +79,9 @@ class ContextAdapter(logging.LoggerAdapter):
 
     def audit(self, msg, *args, **kwargs):
         self.log(logging.AUDIT, msg, *args, **kwargs)
+
+    def trace(self, msg, *args, **kwargs):
+        self.log(logging.TRACE, msg, *args, **kwargs)
 
     def process(self, msg, kwargs):
         if 'extra' not in kwargs:
@@ -340,4 +347,3 @@ if __name__ == '__main__':
     LOG = getLogger("test function")
     LOG.info('fafadfafafffafa')
     LOG.debug('fafadfafafffafa')
-

@@ -165,3 +165,6 @@ class NotFoundImg(WeiboError):
 class ZfwbimgUidNotFound(WeiboError):
     msg_fmt = ("ZfWbimg %(uid)s could not be found.")
 
+class NotFound(WeiboError):
+    msg_fmt = ("ZfWbimg %(uid)s could not be found.")
+

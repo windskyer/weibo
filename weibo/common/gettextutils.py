@@ -12,11 +12,16 @@ import gettext
 import six
 
 
-#mes = gettext.bindtextdomain('messages')
-#_t = gettext.translation(mes)
+# mes = gettext.bindtextdomain('messages')
+# _t = gettext.translation(mes)
 _t = gettext
+
 
 def _(msg):
     if six.PY2:
         return _t.gettext(msg)
     return _t.ugettext(msg)
+
+_LE = _
+_LW = _
+_LI = _
