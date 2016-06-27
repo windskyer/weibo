@@ -41,7 +41,7 @@ class Download(object):
                                     name[1:])
         imagedir = os.path.abspath(imagedir)
         if not os.path.exists(imagedir):
-            os.mkdir(imagedir, 0o777)
+            os.makedirs(imagedir, 0o777)
         return imagedir
 
     def get_all_urls(self, mid):

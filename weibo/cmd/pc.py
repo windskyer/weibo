@@ -8,6 +8,8 @@ Crawler same weibo info
 import os
 import sys
 import argparse
+import eventlet
+eventlet.monkey_patch()
 
 possible_topdir = os.path.normpath(os.path.join(os.path.abspath(__file__),
                                                 os.pardir,
@@ -100,7 +102,7 @@ else:
             CONF()
     else:
         CONF()
-#logging.setup('weibo')
+logging.setup('weibo')
 
 
 def db_sync(version=None):

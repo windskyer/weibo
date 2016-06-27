@@ -258,3 +258,25 @@ class Zfwbtext(BASE, WeiboBase):
 
     # 被转发weibo 的mid
     pa_mid = Column(BigInteger, nullable=True)
+
+
+class Service(BASE, WeiboBase):
+    """Represents a running service on a host."""
+
+    __tablename__ = 'services'
+    __table_args__ = (
+        schema.UniqueConstraint("host", "topic", "deleted",
+                                name="uniq_services0host0topic0deleted"),
+        schema.UniqueConstraint("host", "binary", "deleted",
+                                name="uniq_services0host0binary0deleted")
+        )
+
+    id = Column(Integer, primary_key=True)
+    host = Column(String(255))  # , ForeignKey('hosts.id'))
+    binary = Column(String(255))
+    topic = Column(String(255))
+    report_count = Column(Integer, nullable=False, default=0)
+    disabled = Column(Boolean, default=False)
+    disabled_reason = Column(String(255))
+    last_seen_up = Column(DateTime, nullable=True)
+    version = Column(String(100))

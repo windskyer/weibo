@@ -1,9 +1,8 @@
-#coding: utf-8
-#author zwei
-#email suifeng20@hotmail.com
+# coding: utf-8
+# author zwei
+# email suifeng20@hotmail.com
 
 import os
-import sys
 import errno
 import inspect
 
@@ -13,17 +12,46 @@ from weibo.common import exception
 
 _BINFILE = version.OBJECT_CONF
 
+
+class Error(Exception):
+    """Base class for cfg exceptions."""
+
+    def __init__(self, msg=None):
+        self.msg = msg
+
+    def __str__(self):
+        return self.msg
+
+
+class NoSuchOptError(Error, AttributeError):
+    """Raised if an opt which doesn't exist is referenced."""
+
+    def __init__(self, opt_name, group=None):
+        self.opt_name = opt_name
+        self.group = group
+
+    def __str__(self):
+        if self.group is None:
+            return "no such option: %s" % self.opt_name
+        else:
+            return "no such option in group %s: %s" % (self.group.name,
+                                                       self.opt_name)
+
+
 def _normalize_group_name(group_name):
     if group_name == 'DEFAULT':
         return group_name
     return group_name.lower()
 
+
 def _get_binary_name():
     return os.path.basename(inspect.stack()[-1][1])
+
 
 def _fixpath(p):
     """Apply tilde expansion and absolutization to a path."""
     return os.path.abspath(os.path.expanduser(p))
+
 
 def _get_config_dirs(project=None):
     """ ~/.foo.conf
@@ -83,6 +111,7 @@ class ParseError(Exception):
 
     def __str__(self):
         return 'at line %d, %s: %r' % (self.lineno, self.msg, self.line)
+
 
 class BaseParser(object):
     lineno = 0
@@ -182,6 +211,7 @@ class BaseParser(object):
     def error_no_section_name(self, line):
         raise self.parse_exc('Empty section name', self.lineno, line)
 
+
 class ConfigParser(BaseParser):
     def __init__(self, filename, sections):
         super(ConfigParser, self).__init__()
@@ -202,7 +232,7 @@ class ConfigParser(BaseParser):
         self.sections.setdefault(self.section, {})
 
         if self._normalized is not None:
-            self._normalized.setdefault(_normalize_group_name(self.section),{})
+            self._normalized.setdefault(_normalize_group_name(self.section), {})
 
     def assignment(self, key, value):
         if not self.section:
@@ -244,14 +274,15 @@ class ConfigParser(BaseParser):
             raise exception.ConfigFileParseError(pe.filename, str(pe))
         except IOError as err:
             if err.errno == errno.ENOENT:
-                #namespace._file_not_found(config_file)
+                # namespace._file_not_found(config_file)
                 return
             if err.errno == errno.EACCES:
-                #namespace._file_permission_denied(config_file)
+                # namespace._file_permission_denied(config_file)
                 return
             raise
 
         namespace._add_parsed_config_file(sections, normalized)
+
 
 class _SubNamespace(object):
     def __init__(self, group):
@@ -290,6 +321,7 @@ class _SubNamespace(object):
     def __repr__(self):
         return self.__str__()
 
+
 class _Namespace(_SubNamespace):
     def __init__(self):
         self.all_groups = []
@@ -326,6 +358,10 @@ class _Namespace(_SubNamespace):
                         value = value_lists
             else:
                 subvalue = ''.join(v)
+                try:
+                    subvalue = eval(subvalue)
+                except:
+                    pass
                 if subvalue == "True" or subvalue == "true":
                     subvalue = True
                 if subvalue == "False" or subvalue == "false":
@@ -349,7 +385,7 @@ class _Namespace(_SubNamespace):
         self.sections = sections
         for g in sections.keys():
             self.all_groups.append(g if g not in self.groups else None)
-        self.all_groups=(filter(bool, self.all_groups))
+        self.all_groups = (filter(bool, self.all_groups))
         self.groups = sections.keys()
         self.prase_sections
 
@@ -376,6 +412,7 @@ class _Namespace(_SubNamespace):
     def __str__(self):
         return "Namespace all [%s] Group" % ','.join(self.all_groups)
 
+
 class ConfigOpts(object):
     def __init__(self):
         """Construct a ConfigOpts object."""
@@ -400,6 +437,7 @@ class ConfigOpts(object):
             return self.namespace[name]
         except Exception:
             raise exception.NoSuchOptError(key=name)
+
     def __getitem__(self, k):
         return self.__getattr__(k)
 

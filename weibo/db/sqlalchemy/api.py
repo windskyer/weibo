@@ -8,6 +8,7 @@ from weibo.db.sqlalchemy import models
 from weibo.db.sqlalchemy.session import get_session
 
 from weibo.common import cfg
+from weibo.common import timeutils
 from weibo.common import log as logging
 
 CONF = cfg.CONF
@@ -666,11 +667,69 @@ def zfwbtext_get_by_mid_and_zf(mid, is_zf=False, session=None):
     return result
 
 
+# --------------services options ---------------------------#
+def _service_get(service_id, session=None):
+    query = model_query(models.Service, session=session).\
+        filter_by(id=service_id)
+
+    result = query.first()
+    if not result:
+        raise exception.ServiceNotFound(service_id=service_id)
+
+    return result
 
 
+def service_get(service_id, use_slave=False):
+    return _service_get(service_id)
 
 
+def service_get_by_args(host, binary, session=None):
+    result = model_query(models.Service, session=session).\
+                     filter_by(host=host).\
+                     filter_by(binary=binary).\
+                     first()
+    if not result:
+        raise exception.NotFound()
 
+    return result
+
+
+def service_create(values):
+    service_ref = models.Service()
+    service_ref.update(values)
+    try:
+        service_ref.save()
+    except exception.DBDuplicateEntry as e:
+        if 'binary' in e.columns:
+            raise exception.ServiceBinaryExists(host=values.get('host'),
+                                                binary=values.get('binary'))
+        raise exception.ServiceTopicExists(host=values.get('host'),
+                                           topic=values.get('topic'))
+    return service_ref
+
+
+def service_update(service_id, values):
+    session = get_session()
+    with session.begin():
+        service_ref = _service_get(service_id, session=session)
+        # Only servicegroup.drivers.db.DbDriver._report_state() updates
+        # 'report_count', so if that value changes then store the timestamp
+        # as the last time we got a state report.
+        if 'report_count' in values:
+            if values['report_count'] > service_ref.report_count:
+                service_ref.last_seen_up = timeutils.utcnow()
+        service_ref.update(values)
+
+    return service_ref
+
+
+def service_get_all(disabled=None):
+    query = model_query(models.Service)
+
+    if disabled is not None:
+        query = query.filter_by(disabled=disabled)
+
+    return query.all()
 
 
 

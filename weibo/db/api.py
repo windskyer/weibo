@@ -256,4 +256,21 @@ class Dbsave(object):
     def save_all_data(self):
         pass
 
+    # --------services options -----------#
+    # get host binary service
+    def service_get_by_args(self, host, binary):
+        return api.service_get_by_args(host, binary)
+
+    def service_create(self, values):
+        return api.service_create(values)
+
+    def service_get(self, service_id):
+        return api.service_get(service_id)
+
+    def service_update(self, service_id, values):
+        return api.service_update(service_id, values)
+
+    def service_get_all(disabled=None):
+        return api.service_get_all(disabled)
+
 db_api = Dbsave()

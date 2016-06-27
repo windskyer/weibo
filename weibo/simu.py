@@ -2,7 +2,6 @@
 # Copyright (c) 2016
 
 import os
-import eventlet
 
 from weibo import exception
 from weibo.db.api import Dbsave
@@ -82,6 +81,10 @@ class Simu(Dbsave):
         cls.username = CONF.username
         cls.password = CONF.password
         cls.cookie_file = CONF.cookie_file
+        LOG.info("weibo set env username %(username)s"
+                 "cookie_file %(cookie_file)s",
+                 {'username': cls.username,
+                  'cookie_file': cls.cookie_file})
 
     @classmethod
     def reset_login(cls):
@@ -104,6 +107,7 @@ class Simu(Dbsave):
 
     @classmethod
     def pre_weibo_login(cls):
+        LOG.info("weibo pre login set env")
         cls.login = Login(cls.username, cls.password)
 
     def get_content(self, url):
@@ -111,7 +115,7 @@ class Simu(Dbsave):
         self.jhtml(content)
         return self.jhtml.weibodata
 
-    def detail(self, url=None):
+    def detail(self, url=None, is_db=False, nickname=None):
         if not url:
             url = self.urls
 
@@ -120,20 +124,35 @@ class Simu(Dbsave):
 
         if isinstance(url, list):
             for u in url:
-                nickname = self.get_nickname(u)
+                if not is_db or not nickname:
+                    nickname = self.get_nickname(u)
                 self.weibodata[nickname] = self._detail(u)
                 LOG.info('Get %(nickname)s user weibo info url is %(url)s',
                          {'nickname': nickname, 'url': u})
 
-        return self.weibodata
+        weibodata = self.weibodata
+        return weibodata
+
+    # get all name info from userdata
+    def get_db_userdata_all(self):
+        udata = self.db_userdata_get_all()
+        return udata
 
     # 使用多线成对一个 大号处理
-    def _eventlet_one_url(self, url):
-        pass
+    def eventlet_one_url(self, url, nickname):
+        try:
+            weibodata = self.detail(url, True, nickname)
+        except exception.DetailNotFound:
+            self.reset_login()
+            return
+
+        self.save_all_data(weibodata)
 
     def _detail(self, url=None):
         if url:
             return self.get_content(url)
+        else:
+            LOG.exception(_('Not Found url'))
 
     def get_zf_wb(self, weibodata=None):
         return weibodata.get('zf_wb', None)
@@ -236,7 +255,7 @@ class Simu(Dbsave):
 
     def save_zfwbimg(self, zf_wb=None, iszf=True):
         zf_wbimg = self.get_wbimg_data(zf_wb, iszf)
-        if zf_wbimg.has_key('urls'):
+        if 'urls' in zf_wbimg.keys():
             urls = zf_wbimg.pop('urls')
             if urls:
                 for url in urls:
@@ -245,7 +264,7 @@ class Simu(Dbsave):
 
     def save_wbimg(self, weibodata=None):
         wbimg = self.get_wbimg_data(weibodata)
-        if wbimg.has_key('urls'):
+        if 'urls' in wbimg.keys():
             urls = wbimg.pop('urls')
             if urls:
                 for url in urls:
@@ -262,7 +281,10 @@ class Simu(Dbsave):
             self.save_wbtext(weibodata)
             self.save_wbimg(weibodata)
 
-    def save_all_data(self):
-        values = self.weibodata
+    def save_all_data(self, weibodata=None):
+        if not weibodata:
+            values = self.weibodata
+        else:
+            values = weibodata
         for nickname, data in values.items():
             self.save_data(data)

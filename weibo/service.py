@@ -6,7 +6,7 @@ from weibo import exception
 from weibo import version
 from weibo.common import cfg
 from weibo.common import service
-from weibo.db import api as db
+from weibo.db.api import db_api as db
 from weibo.common.gettextutils import _, _LW
 from weibo.common import log as logging
 from weibo.common import importutils
@@ -50,12 +50,11 @@ class Service(service.Service):
                   {'topic': self.topic, 'version_string': version_string})
         self.model_disconnected = False
         try:
-            service_ref = db.service_get_by_args(ctxt,
-                                                 self.host,
+            service_ref = db.service_get_by_args(self.host,
                                                  self.binary)
             self.service_id = service_ref['id']
         except exception.NotFound:
-            self._create_service_ref(ctxt)
+            self._create_service_ref()
 
         # self.conn = rpc.create_connection(new=True)
         LOG.debug(_("Creating Consumer connection for Service %s") %
@@ -78,10 +77,12 @@ class Service(service.Service):
                                       self.periodic_interval_max)
 
     def _create_service_ref(self):
+        version_string = version.version_string()
         service_ref = db.service_create({'host': self.host,
                                          'binary': self.binary,
                                          'topic': self.topic,
                                          'report_count': 0,
+                                         'version': version_string
                                          })
         self.service_id = service_ref['id']
 
@@ -143,7 +144,10 @@ class Service(service.Service):
 
     def periodic_tasks(self, raise_on_error=False):
         """Tasks to be run at a periodic interval."""
-        return self.manager.periodic_tasks(ctxt, raise_on_error=raise_on_error)
+        kwargs = {}
+        kwargs['tg'] = self.tg
+        return self.manager.periodic_tasks(raise_on_error=raise_on_error,
+                                           **kwargs)
 
     def report_state(self):
         """Update the state of this service in the datastore."""
@@ -160,6 +164,8 @@ class Service(service.Service):
             state_catalog['report_count'] = service_ref['report_count'] + 1
 
             db.service_update(self.service_id, state_catalog)
+            LOG.info(_('Update count is %d .....')
+                     % state_catalog['report_count'])
 
             # TODO(termie): make this pattern be more elegant.
             if getattr(self, 'model_disconnected', False):

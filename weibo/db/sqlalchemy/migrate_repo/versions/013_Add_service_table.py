@@ -1,3 +1,4 @@
+# --*-- coding:utf-8 --*--
 from sqlalchemy import *
 from migrate import *
 
@@ -33,6 +34,12 @@ def _create_services_table(migrate_engine, drop=False):
 
                      # 取消的理由
                      Column('disabled_reason', VARCHAR(200)),
+
+                     # 跟新时间
+                     Column('last_seen_up', DateTime),
+
+                     # 版本号
+                     Column('version', VARCHAR(100)),
 
                      extend_existing=True,
                      mysql_engine='InnoDB',
