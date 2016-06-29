@@ -242,3 +242,7 @@ class ServiceBinaryExists(WeiboError):
 
 class ServiceTopicExists(WeiboError):
     msg_fmt = _("Service with host %(host)s topic %(topic)s exists.")
+
+
+class ResetLoginError(WeiboError):
+    msg_fmt = _("Weibo not reset login")

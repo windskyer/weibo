@@ -2,6 +2,7 @@
 # Copyright (c) 2016
 
 import os
+import six
 
 from weibo import exception
 from weibo.db.api import Dbsave
@@ -9,6 +10,7 @@ from weibo.login import Login
 from weibo.jhtml import Jhtml
 from weibo.common import cfg
 from weibo.common import log as logging
+from weibo.common.gettextutils import _
 
 CONF = cfg.CONF
 LOG = logging.getLogger(__name__)
@@ -35,6 +37,7 @@ class Simu(Dbsave):
         self.get_nicknames
         self.login = Login(self.username, self.password)
         self.jhtml = Jhtml()
+        self.exist_weibodata = []
 
     @property
     def get_urls_name(self):
@@ -81,7 +84,7 @@ class Simu(Dbsave):
         cls.username = CONF.username
         cls.password = CONF.password
         cls.cookie_file = CONF.cookie_file
-        LOG.info("weibo set env username %(username)s"
+        LOG.info("weibo set env username %(username)s "
                  "cookie_file %(cookie_file)s",
                  {'username': cls.username,
                   'cookie_file': cls.cookie_file})
@@ -89,6 +92,7 @@ class Simu(Dbsave):
     @classmethod
     def reset_login(cls):
         if os.path.exists(cls.cookie_file):
+            LOG.info("weibo login is reset remove cookie_file")
             os.remove(cls.cookie_file)
 
         cls.set_env()
@@ -119,16 +123,17 @@ class Simu(Dbsave):
         if not url:
             url = self.urls
 
-        if isinstance(url, str):
+        if isinstance(url, six.string_types):
             url = [url]
 
         if isinstance(url, list):
             for u in url:
                 if not is_db or not nickname:
                     nickname = self.get_nickname(u)
-                self.weibodata[nickname] = self._detail(u)
-                LOG.info('Get %(nickname)s user weibo info url is %(url)s',
+
+                LOG.info(_('Get %(nickname)s user weibo info url is %(url)s'),
                          {'nickname': nickname, 'url': u})
+                self.weibodata[nickname] = self._detail(u)
 
         weibodata = self.weibodata
         return weibodata
@@ -140,16 +145,33 @@ class Simu(Dbsave):
 
     # 使用多线成对一个 大号处理
     def eventlet_one_url(self, url, nickname):
-        try:
-            weibodata = self.detail(url, True, nickname)
-        except exception.DetailNotFound:
-            self.reset_login()
-            return
-
-        self.save_all_data(weibodata)
+        if nickname not in self.exist_weibodata:
+            LOG.info(_("updating %(nickname)s from %(url)s"),
+                     {'nickname': nickname,
+                      'url': url}
+                     )
+            self.exist_weibodata.append(nickname)
+            try:
+                weibodata = self.detail(url, True, nickname)
+            except exception.DetailNotFound:
+                LOG.error(_('reset login weibo use athors weibo user,password'))
+                try:
+                    self.reset_login(nickname)
+                except:
+                    raise exception.ResetLoginError()
+            else:
+                self.exist_weibodata.remove(nickname)
+                self.save_all_data(weibodata)
+        else:
+            LOG.warn(_("not updating %(nickname)s from %(url)s"),
+                     {'nickname': nickname,
+                      'url': url}
+                     )
 
     def _detail(self, url=None):
         if url:
+            LOG.info(_('get all weibo info from %(url)s'),
+                     {'url': url})
             return self.get_content(url)
         else:
             LOG.exception(_('Not Found url'))

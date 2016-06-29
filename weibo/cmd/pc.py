@@ -50,7 +50,7 @@ class ArgumentParser(argparse.ArgumentParser):
         """
         self.print_usage(sys.stderr)
         # FIXME(lzyeval): if changes occur in argparse.ArgParser._check_value
-        choose_from = ' (choose from'
+        choose_from = '( choose from'
         progparts = self.prog.partition(' ')
         self.exit(2, "error: %(errmsg)s\nTry '%(mainp)s help %(subp)s'"
                   " for more information.\n" %
@@ -159,7 +159,7 @@ def dnmain():
     download.main()
 
 
-def test():
+def main():
     launcher = service.get_launcher()
     LOG = logging.getLogger(__name__)
     service_started = False

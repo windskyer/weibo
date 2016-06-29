@@ -3,7 +3,7 @@ from weibo import simu
 from weibo import userdata
 from weibo import download
 from weibo import manager
-# from weibo import exception
+from weibo import exception
 from weibo.common import cfg
 from weibo.common import periodic_task
 from weibo.common.gettextutils import _LI
@@ -23,6 +23,7 @@ class Wbmanager(manager.Manager):
         simu.Simu.check_login()
         # 模拟登陆的功能扩展待完善
         self.simulogin = simu.Simu()
+        self.exist_udata_name = []
 
     # 设置周期任务 14400s  每天更新4次
     @periodic_task.periodic_task(spacing=14400)
@@ -43,18 +44,24 @@ class Wbmanager(manager.Manager):
 
     # 更新周期
     def update_one_weibo(self, url, name):
-        self.simulogin.eventlet_one_url(url, name)
+        try:
+            self.simulogin.eventlet_one_url(url, name)
+        except exception.ResetLoginError:
+            self.reset_login_weibo
 
-    @periodic_task.periodic_task(spacing=5)
+    @periodic_task.periodic_task(spacing=2)
     def update_webo_info(self, **kwargs):
         udata = self.simulogin.get_db_userdata_all()
         for u in udata:
-            url = u.get('homepage', None)
             nickname = u.get('screen_name', None)
+            if nickname in self.exist_udata_name:
+                continue
+            self.exist_udata_name.append(nickname)
+            url = u.get('homepage', None)
             # 设置微博每 10 分钟更新 一次
             tg = kwargs.get('tg', None)
             if not tg:
                 return
             LOG.info(_LI('update %(nickname)s weibo info to db'),
-                     {'nickanme': nickname})
-            tg.add_timer(600, self.update_one_weibo(url, nickname))
+                     {'nickname': nickname})
+            tg.add_timer(300, self.update_one_weibo, 60, url, nickname)
