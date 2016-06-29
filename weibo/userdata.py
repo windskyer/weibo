@@ -6,6 +6,7 @@ from weibo import exception
 from weibo.api import api
 from weibo.db import api as db_api
 from weibo.common import cfg
+from weibo.common.gettextutils import _
 from weibo.common import log as logging
 
 CONF = cfg.CONF
@@ -26,6 +27,9 @@ class Userdata(db_api.Dbsave):
     def get_userapi(self, rm=False):
         if isinstance(self.api_key, list) and self.api_num < len(self.api_key):
             api_key = self.api_key[self.api_num]
+        else:
+            api_key = self.api_key
+        LOG.info(_('use api key info %s' % api_key))
         self.userapi = api.useAPI(CONF[api_key], rm)
         self.api_num = self.api_num + 1
 
