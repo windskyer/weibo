@@ -85,3 +85,11 @@ weibapi --config-file etc/weibo.conf
 
 ```
 
+定时更新微博信息
+====
+```
+周期性的获取数据信息
+weibo --config-file etc/weibo.conf
+
+````
+
