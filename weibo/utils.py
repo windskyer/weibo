@@ -20,7 +20,6 @@ def str_dict_replace(s, mapping):
     return s
 
 
-
 def diff_dict(orig, new):
     """
     Return a dict describing how to change orig to new.  The keys

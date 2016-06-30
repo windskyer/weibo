@@ -607,19 +607,20 @@ def get_all_weibo():
     url = ("http://weibo.com/p/aj/v6/mblog/mbloglist"
            "?ajwvr=6"
            "&domain=100505"
-           "&refer_flag=0000015010_"
-           "&from=feed"
-           "&loc=nickname"
-           "&is_all=1"
-           "&pagebar=0"
-           "&pl_name=Pl_Official_MyProfileFeed__24"
+           #"&refer_flag=0000015010_"
+           #"&from=feed"
+           #"&loc=nickname"
+           #"&is_all=1"
+           "&pagebar=1"
+           #"&pl_name=Pl_Official_MyProfileFeed__24"
            "&id=1005055466017088"
            "&script_uri=/u/5466017088"
-           "&feed_type=0"
-           "&page=1"
-           "&pre_page=1"
-           "&domain_op=100505"
-           "&__rnd=1467275165638")
+           #"&feed_type=0"
+           "&page=3"
+           "&pre_page=2"
+           #"&domain_op=100505"
+           #"&__rnd=1467275165638")
+           )
 
     return url
 
