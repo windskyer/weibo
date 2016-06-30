@@ -47,7 +47,7 @@ def _normalize_group_name(group_name):
 
 def _get_binary_name():
     global _BINNAME
-    if _BINNAME:
+    if not _BINNAME:
         binname = os.path.basename(inspect.stack()[-1][1])
     else:
         binname = _BINNAME
