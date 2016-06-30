@@ -12,6 +12,7 @@ from bs4.element import Tag
 from bs4 import BeautifulSoup
 
 from weibo import exception
+from weibo.common.gettextutils import _
 from weibo.common import log as logging
 
 LOG = logging.getLogger(__name__)
@@ -156,6 +157,8 @@ class JDetail(object):
             attrs.setdefault('name', name)
             attrs.setdefault('class', None)
             attrs.setdefault('node-type', None)
+            LOG.exception(_("children %(name)s, %(class)s, "
+                            "%(node-type)s"), attrs)
             raise exception.NotFoundChildrenTag(attrs)
         return children
 
