@@ -1,6 +1,43 @@
 CHANGES
 =======
 
+* add log.excepton
+* add smoe
+* add smoe
+* remove iso8191
+* more cmd dir
+* add more setup.cfg info
+* add more thread
+* add more thread
+* add eventlet task
+* add eventlet service
+* add eventlet service
+* add auto taks
+* add all file db download
+* delete blanck
+* alter version info
+* alter requirements file info
+* add bug for userdata
+* add userdat
+* 添加获取 userdata 的信息
+* add userdata READme INFO
+* add userdata READme INFO
+* add api userdata
+* add log file
+* add more host
+* add multi values
+* add more info
+* weibopc info
+* delete config_file func
+
+2016.5.16
+---------
+
+* delete 中文
+* add req
+* add migrate.cfg file
+* add cfg file
+* add runing start info
 * add runing start info
 * add cfg config_file help info
 * add cfg config_file help info

@@ -9,6 +9,7 @@ import sqlalchemy.orm
 from sqlalchemy.pool import NullPool, StaticPool
 
 from weibo.common import cfg
+from weibo.common.gettextutils import _
 from weibo.common import log as logging
 
 

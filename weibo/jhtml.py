@@ -157,8 +157,8 @@ class JDetail(object):
             attrs.setdefault('name', name)
             attrs.setdefault('class', None)
             attrs.setdefault('node-type', None)
-            LOG.exception(_("children %(name)s, %(class)s, "
-                            "%(node-type)s"), attrs)
+            LOG.debug(_("children %(name)s, %(class)s, "
+                        "%(node-type)s"), attrs)
             raise exception.NotFoundChildrenTag(attrs)
         return children
 

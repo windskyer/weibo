@@ -340,10 +340,3 @@ class ColorHandler(logging.StreamHandler):
     def format(self, record):
         record.color = self.LEVEL_COLORS[record.levelno]
         return logging.StreamHandler.format(self, record)
-
-if __name__ == '__main__':
-    CONF('weibo.conf')
-    setup('weibo')
-    LOG = getLogger("test function")
-    LOG.info('fafadfafafffafa')
-    LOG.debug('fafadfafafffafa')

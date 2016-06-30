@@ -1,8 +1,8 @@
 """
 This module provides Manager, a base class for managers.
 """
-from weibo.common import periodic_task
 from weibo.common import cfg
+from weibo.common import periodic_task
 from weibo.common import log as logging
 
 CONF = cfg.CONF

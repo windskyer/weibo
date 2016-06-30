@@ -448,10 +448,3 @@ class ConfigOpts(object):
         return self.__getattr__(k)
 
 CONF = ConfigOpts()
-
-if __name__ == '__main__':
-    CONF('weibo.confbak')
-    print(CONF.enable_multitargets)
-    print(CONF.DEFAULT.enable_multitargets)
-    print(CONF.t1.nickname)
-    print(CONF['t1'].nickname)
