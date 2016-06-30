@@ -11,6 +11,7 @@ from weibo import version
 from weibo.common import exception
 
 _BINFILE = version.OBJECT_CONF
+_BINNAME = version.OBJECT
 
 
 class Error(Exception):
@@ -45,7 +46,12 @@ def _normalize_group_name(group_name):
 
 
 def _get_binary_name():
-    return os.path.basename(inspect.stack()[-1][1])
+    global _BINNAME
+    if _BINNAME:
+        binname = os.path.basename(inspect.stack()[-1][1])
+    else:
+        binname = _BINNAME
+    return binname
 
 
 def _fixpath(p):
