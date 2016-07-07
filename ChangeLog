@@ -1,6 +1,14 @@
 CHANGES
 =======
 
+* add log info , pid file, enable file, start function
+* alter more page file
+* add more weibo.conf
+
+2016.6.23
+---------
+
+* add more bug
 * add log.excepton
 * add smoe
 * add smoe
@@ -17,7 +25,15 @@ CHANGES
 * delete blanck
 * alter version info
 * alter requirements file info
+
+2016.6.19-01
+------------
+
 * add bug for userdata
+
+2016.6.19
+---------
+
 * add userdat
 * 添加获取 userdata 的信息
 * add userdata READme INFO
@@ -25,7 +41,15 @@ CHANGES
 * add api userdata
 * add log file
 * add more host
+
+2016.6.10-01
+------------
+
 * add multi values
+
+2016.6.10
+---------
+
 * add more info
 * weibopc info
 * delete config_file func

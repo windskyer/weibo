@@ -1,6 +1,6 @@
 Metadata-Version: 1.1
 Name: weibo
-Version: 2016.6.23
+Version: 2016.6.24
 Summary: 'Climbed out of the weibo information for the specified user'
 Home-page: 'https://github.com/windskyer/weibo'
 Author: 'zwei'
@@ -98,8 +98,22 @@ Description: weibo
         ```
         周期性的获取数据信息
         weibo --config-file etc/weibo.conf
+        ```
         
-        ````
+        后台运行程序
+        ====
+        ```
+        weibo &>/dev/null &
+        ```
+        
+        设置开机启动
+        ====
+        ```
+        前提， centos7 操作系统
+        cp etc/weibo.service /usr/lib/systemd/system/
+        systemctl enable weibo.service
+        systemctl start weibo.service
+        ```
         
         
 Platform: ''
