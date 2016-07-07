@@ -7,19 +7,12 @@ Crawler same weibo info
 '''
 import os
 import sys
+import stat
+import fcntl
 import argparse
 import eventlet
-eventlet.monkey_patch()
 
-possible_topdir = os.path.normpath(os.path.join(os.path.abspath(__file__),
-                                                os.pardir,
-                                                os.pardir,
-                                                os.pardir))
-if os.path.exists(os.path.join(possible_topdir,
-                               "weibo",
-                               "__init__.py")):
-    sys.path.insert(0, possible_topdir)
-
+from weibo import utils
 from weibo import service
 from weibo import simu
 from weibo import version
@@ -32,6 +25,11 @@ from weibo.common import cfg
 from weibo.common.gettextutils import _
 from weibo.common import log as logging
 
+eventlet.monkey_patch()
+possible_topdir = os.path.normpath(os.path.join(os.path.abspath(__file__),
+                                                os.pardir,
+                                                os.pardir,
+                                                os.pardir))
 CONF = cfg.CONF
 dev_conf = os.path.join(possible_topdir,
                         'etc',
@@ -102,7 +100,9 @@ else:
             CONF()
     else:
         CONF()
+
 logging.setup('weibo')
+LOG = logging.getLogger(__name__)
 
 
 def db_sync(version=None):
@@ -159,9 +159,39 @@ def dnmain():
     download.main()
 
 
+def write_pid_file(pid_file, pid):
+    try:
+        fd = os.open(pid_file, os.O_RDWR | os.O_CREAT,
+                     stat.S_IRUSR | stat.S_IWUSR)
+    except OSError as e:
+        LOG.exception(e)
+        return -1
+    flags = fcntl.fcntl(fd, fcntl.F_GETFD)
+    assert flags != -1
+    flags |= fcntl.FD_CLOEXEC
+    r = fcntl.fcntl(fd, fcntl.F_SETFD, flags)
+    assert r != -1
+    # There is no platform independent way to implement fcntl(fd, F_SETLK, &fl)
+    # via fcntl.fcntl. So use lockf instead
+    try:
+        fcntl.lockf(fd, fcntl.LOCK_EX | fcntl.LOCK_NB, 0, 0, os.SEEK_SET)
+    except IOError:
+        r = os.read(fd, 32)
+        if r:
+            logging.error('already started at pid %s' % utils.to_str(r))
+        else:
+            logging.error('already started')
+        os.close(fd)
+        return -1
+    os.ftruncate(fd, 0)
+    os.write(fd, utils.to_bytes(str(pid)))
+    return 0
+
+
 def main():
+    pid = os.getpid()
+    write_pid_file(CONF.pid_file, pid)
     launcher = service.get_launcher()
-    LOG = logging.getLogger(__name__)
     service_started = False
 
     if isinstance(CONF.enable_multiusers, list):

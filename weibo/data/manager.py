@@ -26,13 +26,13 @@ class Wbmanager(manager.Manager):
         self.exist_udata_name = []
 
     # 设置周期任务 14400s  每天更新4次
-    @periodic_task.periodic_task(spacing=14400)
+    @periodic_task.periodic_task(spacing=CONF.userdata_interval)
     def update_userdata_info(self, **kwargs):
         LOG.info(_LI('update userdata info to db'))
         self.udata.save_all_users()
 
     # 设置微博每 10 分钟更新 一次
-    @periodic_task.periodic_task(spacing=600)
+    @periodic_task.periodic_task(spacing=CONF.download_interval)
     def download_all_img(self, **kwargs):
         LOG.info(_LI('download all img to db'))
         self.imagedl.download()
@@ -49,7 +49,7 @@ class Wbmanager(manager.Manager):
         except exception.ResetLoginError:
             self.reset_login_weibo
 
-    @periodic_task.periodic_task(spacing=2)
+    @periodic_task.periodic_task(spacing=CONF.weiboinfo_interval)
     def update_webo_info(self, **kwargs):
         udata = self.simulogin.get_db_userdata_all()
         for u in udata:

@@ -90,6 +90,19 @@ weibapi --config-file etc/weibo.conf
 ```
 周期性的获取数据信息
 weibo --config-file etc/weibo.conf
+```
 
-````
+后台运行程序
+====
+```
+weibo &>/dev/null &
+```
 
+设置开机启动
+====
+```
+前提， centos7 操作系统
+cp etc/weibo.service /usr/lib/systemd/system/
+systemctl enable weibo.service
+systemctl start weibo.service
+```

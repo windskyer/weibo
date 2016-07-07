@@ -1,0 +1,14 @@
+[Unit]
+Description=Climbed out of the weibo information for the specified user daemon
+After=network.target
+
+[Service]
+PIDFile=/tmp/weibo.pid
+ExecStart=/usr/bin/weibo &>/dev/null &
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=on-failure
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target
