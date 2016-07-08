@@ -104,14 +104,15 @@ class JDetail(object):
         if content is None:
             content = self.content
 
-        # 确保完整的html 信息
-        WB = WB[5:-5]
         # 去掉 "\\n, \\r, \\t, \\/, \\"
         WB = WB.replace('\\n', '')
         WB = WB.replace('\\t', '')
         WB = WB.replace('\\r', '')
         WB = WB.replace('\\/', '/')
         WB = WB.replace('\\', '')
+
+        # 确保完整的html 信息
+        WB = WB[WB.find('>') + 1:WB.rfind('<')]
         return WB.strip()
 
     # 是否是转发微博

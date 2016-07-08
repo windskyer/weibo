@@ -40,6 +40,7 @@ url3 = http://weibo.com/jiqun
 #python3 run.py
 
 安装方法
+yum install -y gcc mysql-devel python-devel
 pip install -r requirements.txt
 python setup.py install
 
