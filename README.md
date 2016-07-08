@@ -53,7 +53,21 @@ database
 sql_connection = mysql://weibo:weibo@192.168.122.206/weibo?charset=utf8
 
 2, 在mysql数据库 中的 创建 weibo 数据库
-create database weibo;
+2.1. 配置mysql 数据库
+[client]
+default-character-set=utf8
+
+[mysql]
+default-character-set=utf8
+
+
+[mysqld]
+collation-server = utf8_unicode_ci
+init-connect='SET NAMES utf8'
+character-set-server = utf8
+
+2.2 创建数据库
+ create database weibo DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 3, 同步数据库表格
 weibodb --config-file etc/weibo.conf
@@ -89,6 +103,8 @@ weibapi --config-file etc/weibo.conf
 ====
 ```
 周期性的获取数据信息
+# 由于 weibo 官网 api  有次数限制 userdata 数据 一小时 更新一次。
+# weibo 大号的信息 每5 分钟更新一次
 weibo --config-file etc/weibo.conf
 ```
 
