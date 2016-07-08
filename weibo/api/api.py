@@ -8,6 +8,7 @@ except:
 
 from weibo.common import cfg
 from weibo.common import log as logging
+from weibo.common.gettextutils import _
 from weibo.api.client import Client
 
 
@@ -40,26 +41,29 @@ class useAPI(object):
                     self.api = api
                     return True
                 except:
-                    LOG.error("token maybe out of time!")
+                    LOG.error(_("token maybe out of time!"))
             except:
-                LOG.error("The token file error")
+                LOG.error(_("The token file error"))
         return False
 
     def token(self, CODE=''):
         client, url = self.getCODE()
         if not self.checked:
             if CODE == '':
-                webbrowser.open_new(url)
+                is_open = webbrowser.open_new(url)
+                if not is_open:
+                    LOG.info(_("Please use the browser to open %(url)s"),
+                             {'url': url})
                 try:
                     # for python2.x
-                    CODE = raw_input("Please Input the Code: ").strip()
+                    CODE = raw_input(_("Please Input the Code: ")).strip()
                 except:
                     # for python3.x
-                    CODE = input("Please Input the Code: ").strip()
+                    CODE = input(_("Please Input the Code: ")).strip()
             try:
                 client.set_code(CODE)
             except:
-                LOG.error("Maybe wrong CODE")
+                LOG.error(_("Maybe wrong CODE"))
                 return
         token = client.token
         pkl.dump(token, open(str(self.token_file), 'wb'))
