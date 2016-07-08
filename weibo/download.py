@@ -12,6 +12,7 @@ from weibo import exception
 from weibo.common import cfg
 from weibo.common import log as logging
 from weibo.db.api import db_api
+from weibo.common.gettextutils import _
 
 CONF = cfg.CONF
 LOG = logging.getLogger(__name__)
@@ -100,6 +101,7 @@ class ImageDl(Download):
             self.uids.append(value.uid)
 
     def get_all_img_urls(self, uid):
+        LOG.info(_('Get all img url from wbimg table'))
         urls = []
         if db_api.is_wbimg_get_by_uid(uid):
             imgs = db_api.db_wbimg_get_by_uid(uid)
@@ -108,9 +110,10 @@ class ImageDl(Download):
                 if not url:
                     continue
                 urls.append(url)
-        self.urls.setdefault('wb', urls)
+        return urls
 
     def get_all_zfimg_urls(self, uid):
+        LOG.info(_('Get all img url from zfwbimg table'))
         urls = []
         if db_api.is_zfwbimg_get_by_uid(uid):
             zfimgs = db_api.db_zfwbimg_get_by_uid(uid)
@@ -119,7 +122,7 @@ class ImageDl(Download):
                 if not url:
                     continue
                 urls.append(url)
-        self.urls.setdefault('zfwb', urls)
+        return urls
 
     def exists_img(self, url):
         is_exists = False
@@ -128,11 +131,20 @@ class ImageDl(Download):
             is_exists = True
         return is_exists, imgfile
 
-    def download(self):
-        self.get_db_all_uid
+    def download(self, uid=None):
+        urls = []
+        zfurls = []
+        if not uid:
+            self.get_db_all_uid
+        else:
+            self.uids = [uid]
+
         for uid in self.uids:
-            self.get_all_img_urls(uid)
-            self.get_all_zfimg_urls(uid)
+            urls.extend(self.get_all_img_urls(uid))
+            zfurls.extend(self.get_all_zfimg_urls(uid))
+
+        self.urls['wb'] = urls
+        self.urls['zfwb'] = zfurls
         for k, v in self.urls.items():
             for url in v:
                 is_exists, imgfile = self.exists_img(url)
@@ -160,7 +172,6 @@ class ImageDl(Download):
             img = db_api.db_zfwbimg_get_by_url(url)
         img.location = location
         img.save()
-
 
 
 class VideosDl(Download):

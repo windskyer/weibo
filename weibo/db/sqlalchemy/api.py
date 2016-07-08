@@ -441,6 +441,14 @@ def wbimg_get_by_uid(uid, session=None):
     return result
 
 
+def wbimg_get_by_uid_location(uid, session=None):
+    result = model_query(models.Wbimg, session=session).\
+                     filter_by(uid=uid).\
+                     filter_by(location=None).\
+                     all()
+    return result
+
+
 def wbimg_get_by_mid(mid, session=None):
     result = model_query(models.Wbimg, session=session).\
                      filter_by(mid=mid).\
@@ -551,6 +559,14 @@ def zfwbimg_get_by_uid(uid, session=None):
     if not result:
         raise exception.ZfwbimgUidNotFound(uid=uid)
 
+    return result
+
+
+def zfwbimg_get_by_uid_location(uid, session=None):
+    result = model_query(models.Zfwbimg, session=session).\
+                     filter_by(uid=uid).\
+                     filter_by(location=None).\
+                     all()
     return result
 
 
@@ -730,52 +746,3 @@ def service_get_all(disabled=None):
         query = query.filter_by(disabled=disabled)
 
     return query.all()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-if __name__ == '__main__':
-    CONF('weibo.conf')
-    values = {u'uid': 1337970873, u'screen_name': u'\u6d77\u6d9b\u6cd5\u5e08', u'name': u'\u6d77\u6d9b\u6cd5\u5e08', u'location': u'\u53f0\u6e7e',
-     u'description': u'雷东', u'friends_count': 1378,  u'followers_count': 46336090, 'ability_tags' : 'unknow', u'gender': u'm', u'urank': 27,  u'credit_score': 80,
-     u'created_at': u'Wed Mar 30 17:02:40 +0800 2011',}
-    #userdata_delete_uid(values['uid'])
-    #userdata_delete(2)
-    #try:
-    #    userdata_create(values)
-    #except exception.UserdataNameExists as e:
-    #    print(e.message)
-    #userdata_get_by_uid(values['uid'])
-    #userdata_get_all()
-    #userdata_get_by_name('海涛法师')
-    #userdata_update(values)
-    print(len(userdata_get_all()))

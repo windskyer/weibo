@@ -174,6 +174,10 @@ class Dbsave(object):
     def db_wbimg_get_by_uid(self, uid):
         return api.wbimg_get_by_uid(uid)
 
+    # get uid from wbimg db
+    def db_wbimg_get_by_uid_location(self, uid):
+        return api.wbimg_get_by_uid_location(uid)
+
     # get mid  and is_zf and pa_mid from wbimg db
     def db_wbimg_get_by_mid_and_zf(self, mid, is_zf=False):
         try:
@@ -234,6 +238,10 @@ class Dbsave(object):
     # get uid from zfwbimg db
     def db_zfwbimg_get_by_uid(self, uid):
         return api.zfwbimg_get_by_uid(uid)
+
+    # get uid from zfwbimg  and location db
+    def db_zfwbimg_get_by_uid_location(self, uid):
+        return api.zfwbimg_get_by_uid_location(uid)
 
     # get mid from zfwbimg db
     def is_zfwbimg_get_by_mid(self, mid):
