@@ -92,8 +92,8 @@ class Simu(Dbsave):
     @classmethod
     def reset_login(cls):
         if os.path.exists(cls.cookie_file):
-            LOG.info("weibo login is reset remove cookie_file")
-            os.remove(cls.cookie_file)
+            LOG.info("weibo login is reset change cookie_file")
+            # os.remove(cls.cookie_file)
 
         cls.set_env()
         if not os.path.exists(cls.cookie_file):
