@@ -63,13 +63,20 @@ class Userdata(db_api.Dbsave):
             raise exception.UidNotNull()
         return self.call('users/counts', uids=uid)
 
-    def _get_all_values(self, ushow, ucount):
+    def get_user_domain(self, domain):
+        if not domain:
+            return
+            raise exception.DomainNotNull()
+        return self.call('users/domain_show', domain=domain)
+
+    def _get_all_values(self, ushow, ucount, domain):
         values = {}
         values['uid'] = ushow.get('id')
         values['name'] = ushow.get('name')
         values['screen_name'] = ushow.get('screen_name')
         values['location'] = ushow.get('location')
         values['description'] = ushow.get('description')
+        values['profile_image_url'] = ushow.get('profile_image_url')
         if isinstance(ucount, list):
             ucount = ucount[0]
         values['friends_count'] = ucount.get('friends_count')
@@ -93,7 +100,9 @@ class Userdata(db_api.Dbsave):
         u1 = self.get_user_show(nickname)
         uid = u1.get('id', None)
         u2 = self.get_user_counts(uid)
-        return self._get_all_values(u1, u2)
+        domain = u1.get('domain', None)
+        u3 = self.get_user_domain(domain)
+        return self._get_all_values(u1, u2, u3)
 
     def save_one_user(self, nickname):
         values = self.get_all_valuses(nickname)

@@ -10,12 +10,14 @@ from sqlalchemy import ForeignKey, DateTime, Boolean, Text, Float
 from sqlalchemy.orm import relationship, backref, object_mapper
 
 
+from weibo import exception
 from weibo.db.sqlalchemy import session
 from weibo.common import timeutils
 
 get_session = session.get_session
 
 BASE = declarative_base()
+
 
 class WeiboBase(object):
     """Base class for Weibo Models."""
@@ -28,7 +30,6 @@ class WeiboBase(object):
     deleted_time = Column(DateTime)
     deleted = Column(Boolean, default=False)
     metadata = None
-
 
     def save(self, session=None):
         """Save this object."""
@@ -114,7 +115,7 @@ class Userdata(BASE, WeiboBase):
     followers_count = Column(BigInteger)
 
     # 标签
-    ability_tags =  Column(String(15))
+    ability_tags = Column(String(15))
 
     # 性别
     gender = Column(String(15), default='m')
@@ -133,6 +134,10 @@ class Userdata(BASE, WeiboBase):
 
     # 微博主页地址
     homepage = Column(String(150))
+
+    # 头像
+    profile_image_url = Column(String(150), default=None)
+
 
 class Weibo(BASE, WeiboBase):
     __tablename__ = 'weibo'
@@ -165,6 +170,7 @@ class Weibo(BASE, WeiboBase):
 
     # 发布来源
     source = Column(String(150))
+
 
 class Zfwbimg(BASE, WeiboBase):
     __tablename__ = 'zfwbimg'
