@@ -232,6 +232,39 @@ class Login(BaseLogin):
         except:
             return 0
 
+    def save_cookie(self, text, cookie_file=CONF.cookie_file):
+        cookie_jar2 = cookielib.LWPCookieJar()
+        cookie_support2 = urllib2.HTTPCookieProcessor(cookie_jar2)
+        opener2 = urllib2.build_opener(cookie_support2, urllib2.HTTPHandler)
+        urllib2.install_opener(opener2)
+        if six.PY3:
+            text = text.decode('gbk')
+        p = re.compile('location\.replace\(\'(.*?)\'\)')
+        # 在使用httpfox登录调试时，我获取的返回参数
+        # location.replace('http://weibo.com 这里使用的是单引号
+        # 原来的正则中匹配的是双引号# 导致没有login_url得到 单引号本身在re中无需转义
+        # p = re.compile('location\.replace\(\B'(.*?)'\B\)')
+        # 经调试 这样子是错误的 re中非的使用\'才能表达单引号
+        try:
+            # Search login redirection URL
+            login_url = p.search(text).group(1)
+            data = urllib2.urlopen(login_url).read()
+            # Verify login feedback, check whether result is TRUE
+            patt_feedback = 'feedBackUrlCallBack\((.*)\)'
+            p = re.compile(patt_feedback, re.MULTILINE)
+
+            feedback = p.search(data).group(1)
+            feedback_json = json.loads(feedback)
+            if feedback_json['result']:
+                cookie_jar2.save(cookie_file,
+                                 ignore_discard=True,
+                                 ignore_expires=True)
+                return 1
+            else:
+                return 0
+        except:
+            return 0
+
     def get_pwd_wsse(self, pwd, servertime, nonce):
         """
         Get wsse encrypted password

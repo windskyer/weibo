@@ -115,8 +115,13 @@ class Simu(Dbsave):
         cls.login = Login(cls.username, cls.password)
 
     def get_content(self, url):
-        content = self.login.getHTML(url)
-        self.jhtml(content)
+        try:
+            content = self.login.getHTML(url)
+            self.jhtml(content)
+        except exception.DetailNotFound:
+            self.login.cookie_file(content)
+            content = self.login.getHTML(url)
+            self.jhtml(content)
         return self.jhtml.weibodata
 
     def detail(self, url=None, is_db=False, nickname=None):
