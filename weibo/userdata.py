@@ -115,3 +115,8 @@ class Userdata(db_api.Dbsave):
                 self.save_one_user(nickname)
         else:
             self.save_one_user(self.nicknames)
+
+
+class Huserdata(db_api.Dbsave):
+    def get_html(self):
+        pass

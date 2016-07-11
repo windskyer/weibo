@@ -176,6 +176,10 @@ class DetailNotFound(WeiboError):
     msg_fmt = ("Not Found weibo detail info")
 
 
+class PersonNotFound(WeiboError):
+    msg_fmt = ("Not Found weibo person info")
+
+
 class NicknameNotNull(WeiboError):
     msg_fmt = ("nickname is Not null")
 

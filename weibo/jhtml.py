@@ -12,6 +12,7 @@ from bs4.element import Tag
 from bs4 import BeautifulSoup
 
 from weibo import exception
+from weibo.jiexi import userinfo
 from weibo.common.gettextutils import _
 from weibo.common import log as logging
 
@@ -436,11 +437,13 @@ class Jhtml(object):
     '''
 
     def __init__(self, *args, **kwargs):
+        self.userinfo = userinfo.Userinfo()
         self.weibodata = []
 
     def __call__(self, content):
         self.jdetail = JDetail()
         self.jiexi2(content)
+        self.fl_values = self.userinfo.jiexi2(content)
 
     def tmp_file(self, content):
         tmp = re.findall(r'pl\.content\.homeFeed\.'
@@ -597,7 +600,10 @@ class Jhtml(object):
                 wb_info.setdefault('zf_mid', zf_wb.get('mid', None))
             self.weibodata.append(wb_info)
 
-        return self.weibodata
+        weibodata_dict = {}
+        weibodata_dict['userdata'] = self.fl_values
+        weibodata_dict['weibodata'] = self.weibodata
+        return weibodata_dict
 
     def jiexi2(self, content=None):
         if content is None:

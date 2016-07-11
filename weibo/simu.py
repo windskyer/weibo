@@ -302,11 +302,19 @@ class Simu(Dbsave):
         if zf_wb:
             self.save_zfwbimg(zf_wb)
 
-    def save_data(self, weibodatas=None):
-        for weibodata in weibodatas:
+    def save_userdata(self, nickname, values):
+        if self.is_userdata_get_by_name(nickname):
+            userdata = self.db_userdata_get_by_name(nickname)
+            userdata.description = values.get('description')
+            userdata.save()
+
+    def save_data(self, nickname, weibodatas=None):
+        for weibodata in weibodatas['weibodata']:
             self.save_weibo(weibodata)
             self.save_wbtext(weibodata)
             self.save_wbimg(weibodata)
+        userdata = weibodatas['userdata']
+        self.save_userdata(nickname, userdata)
 
     def save_all_data(self, weibodata=None):
         if not weibodata:
@@ -314,4 +322,4 @@ class Simu(Dbsave):
         else:
             values = weibodata
         for nickname, data in values.items():
-            self.save_data(data)
+            self.save_data(nickname, data)

@@ -500,6 +500,8 @@ def jiexi(content):
             max = len(i)
             content = i
 
+    with open('/tmp/aaaa.html', 'w') as fp:
+        fp.write(content)
     content = content.replace('WB_detail', 'WB_detailWB_detail')
 
     # get all things
@@ -639,9 +641,9 @@ if __name__ == '__main__':
     # print(html.getHTML('http://www.weibo.com/kaifulee'))
     # import pdb
     #pdb.set_trace()
-    #aa = simu()
-    #aa.pre_weibo_login
-    #url = get_all_weibo()
+    aa = simu()
+    aa.pre_weibo_login
+    url = get_all_weibo()
     #url = 'http://weibo.com/wangmanyu777888?page=3&ajaxpagelet=1&ajaxpagelet_v6=1&__ref=%2Fwangmanyu777888%3Frefer_flag%3D1005055013_%26is_hot%3D1&_t=FM_146727835709330'
     #url = 'http://weibo.com/wangmanyu777888?pids=Pl_Official_MyProfileFeed__25&is_search=0&visible=0&is_hot=1&is_tag=0&profile_ftype=1&page=2&ajaxpagelet=1&ajaxpagelet_v6=1&__ref=%2Fwangmanyu777888%3Frefer_flag%3D1005055013_%26is_hot%3D1&_t=FM_146727835709330'
     #print(urllib2.urlopen(url).read())
@@ -651,8 +653,8 @@ if __name__ == '__main__':
 
     # API 参考 http://open.weibo.com/wiki/%E5%BE%AE%E5%8D%9AAPI
     # 使用参考 https://github.com/lxyu/weibo
-    api = useAPI()
-    print(api.get('statuses/user_timeline', 200, uid=3538755522))
+    #api = useAPI()
+    #print(api.get('statuses/user_timeline', 200, uid=3538755522))
     #print(api.get('account/get_uid'))
     #print(get_all_mid(api))
     #print mids
