@@ -64,6 +64,7 @@ class Userdata(db_api.Dbsave):
         return self.call('users/counts', uids=uid)
 
     def get_user_domain(self, domain):
+        return
         if not domain:
             return
             raise exception.DomainNotNull()
@@ -88,6 +89,9 @@ class Userdata(db_api.Dbsave):
         values['created_at'] = ushow.get('created_at')
         values['profile_url'] = ushow.get('profile_url')
         values['homepage'] = self.set_homepage(ushow.get('profile_url'))
+        values['verified_reason'] = ushow.get('verified_reason')
+        values['verified'] = ushow.get('verified')
+        values['remark'] = ushow.get('remark')
         return values
 
     def set_homepage(self, profile_url=None):

@@ -250,3 +250,6 @@ class ServiceTopicExists(WeiboError):
 
 class ResetLoginError(WeiboError):
     msg_fmt = _("Weibo not reset login")
+
+class NotDescription(WeiboError):
+    msg_fmt = _("Weibo not found descrption info")

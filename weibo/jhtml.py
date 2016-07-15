@@ -439,11 +439,14 @@ class Jhtml(object):
     def __init__(self, *args, **kwargs):
         self.userinfo = userinfo.Userinfo()
         self.weibodata = []
+        self.weibodata_dict = {}
+        self.fl_values = None
 
     def __call__(self, content):
+        self.weibodata = []
         self.jdetail = JDetail()
-        self.jiexi2(content)
-        self.fl_values = self.userinfo.jiexi2(content)
+        wbinfo = self.jiexi2(content)
+        self.get_userdata_info(wbinfo, content)
 
     def tmp_file(self, content):
         tmp = re.findall(r'pl\.content\.homeFeed\.'
@@ -459,6 +462,14 @@ class Jhtml(object):
 
         content = content.replace('WB_detail', 'WB_detailWB_detail')
         return content
+
+    def get_userdata_info(self, wbinfo, content):
+        uid = wbinfo[0].get('uid', None)
+        if uid:
+            self.fl_values = self.userinfo.jiexi2(uid, content)
+            self.weibodata_dict['userdata'] = self.fl_values
+        self.weibodata_dict['weibodata'] = self.weibodata
+        return self.weibodata_dict
 
     def wb_detail(self, content):
         # get all things from WB_detail
@@ -588,7 +599,6 @@ class Jhtml(object):
     def wb_all_jiexi2(self, wb_detail):
         for wb in wb_detail:
             # 初始化wb 信息
-            # import pdb;pdb.set_trace()
             self.wb(wb)
             is_zf = self.is_zf_wb()
             wb_info = self.get_wb_info(wb, False)
@@ -599,11 +609,7 @@ class Jhtml(object):
                 wb_info.setdefault('zf_wb', zf_wb)
                 wb_info.setdefault('zf_mid', zf_wb.get('mid', None))
             self.weibodata.append(wb_info)
-
-        weibodata_dict = {}
-        weibodata_dict['userdata'] = self.fl_values
-        weibodata_dict['weibodata'] = self.weibodata
-        return weibodata_dict
+        return self.weibodata
 
     def jiexi2(self, content=None):
         if content is None:

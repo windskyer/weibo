@@ -138,6 +138,18 @@ class Userdata(BASE, WeiboBase):
     # 头像
     profile_image_url = Column(String(150), default=None)
 
+    # 出生日期
+    birthdate = Column('birthdate', String(200))
+
+    # 认证原因
+    verified_reason = Column('verified_reason', String(200))
+
+    # 是否认证
+    verified = Column('verified', Boolean, default=False)
+
+    # 个人备注， 个性签名
+    remark = Column('remark', String(200))
+
 
 class Weibo(BASE, WeiboBase):
     __tablename__ = 'weibo'

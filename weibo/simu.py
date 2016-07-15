@@ -122,7 +122,7 @@ class Simu(Dbsave):
             self.login.save_cookie(content)
             content = self.login.getHTML(url)
             self.jhtml(content)
-        return self.jhtml.weibodata
+        return self.jhtml.weibodata_dict
 
     def detail(self, url=None, is_db=False, nickname=None):
         if not url:
@@ -305,7 +305,12 @@ class Simu(Dbsave):
     def save_userdata(self, nickname, values):
         if self.is_userdata_get_by_name(nickname):
             userdata = self.db_userdata_get_by_name(nickname)
-            userdata.description = values.get('description')
+            userdata.verified_reason = values.get('verified_reason')
+            wb_descr = values.get('wb_descr', None)
+            if wb_descr:
+                userdata.description = wb_descr.get('description')
+                userdata.birthdate = wb_descr.get('birthdate')
+                userdata.remark = wb_descr.get('remark')
             userdata.save()
 
     def save_data(self, nickname, weibodatas=None):
@@ -313,8 +318,8 @@ class Simu(Dbsave):
             self.save_weibo(weibodata)
             self.save_wbtext(weibodata)
             self.save_wbimg(weibodata)
-        userdata = weibodatas['userdata']
-        self.save_userdata(nickname, userdata)
+        # userdata = weibodatas['userdata']
+        # self.save_userdata(nickname, userdata)
 
     def save_all_data(self, weibodata=None):
         if not weibodata:
