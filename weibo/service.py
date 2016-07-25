@@ -45,6 +45,7 @@ class Service(service.Service):
         self.report_interval = report_interval
 
     def start(self):
+        # self.manager.init_host(self.tg)
         version_string = version.version_string()
         LOG.audit(_('Starting %(topic)s node (version %(version_string)s)'),
                   {'topic': self.topic, 'version_string': version_string})
@@ -74,7 +75,7 @@ class Service(service.Service):
             self.tg.add_dynamic_timer(self.periodic_tasks,
                                       initial_delay=initial_delay,
                                       periodic_interval_max=
-                                      self.periodic_interval_max)
+                                        self.periodic_interval_max)
 
     def _create_service_ref(self):
         version_string = version.version_string()

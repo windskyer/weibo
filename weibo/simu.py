@@ -3,6 +3,7 @@
 
 import os
 import six
+import eventlet
 
 from weibo import exception
 from weibo.db.api import Dbsave
@@ -136,9 +137,9 @@ class Simu(Dbsave):
                 if not is_db or not nickname:
                     nickname = self.get_nickname(u)
 
+                self.weibodata[nickname] = self._detail(u)
                 LOG.info(_('Get %(nickname)s user weibo info url is %(url)s'),
                          {'nickname': nickname, 'url': u})
-                self.weibodata[nickname] = self._detail(u)
 
         weibodata = self.weibodata
         return weibodata
@@ -147,6 +148,21 @@ class Simu(Dbsave):
     def get_db_userdata_all(self):
         udata = self.db_userdata_get_all()
         return udata
+
+    # get all page persifiled url
+    def get_one_page_url(self, url, nickname):
+        try:
+            LOG.info(_("Geting %(nickname)s from %(url)s in this page"),
+                     {'nickname': nickname,
+                      'url': url}
+                     )
+            weibodata = self.detail(url, True, nickname)
+        except exception.DetailNotFound:
+            raise exception.ResetLoginError()
+        except exception.DetailEmptyFound:
+            raise exception.WeiboEnd
+        else:
+            self.save_all_data(weibodata)
 
     # 使用多线成对一个 大号处理
     def eventlet_one_url(self, url, nickname):
@@ -158,6 +174,7 @@ class Simu(Dbsave):
             self.exist_weibodata.append(nickname)
             try:
                 weibodata = self.detail(url, True, nickname)
+                eventlet.greenthread.sleep(20)
             except exception.DetailNotFound:
                 LOG.error(_('reset login weibo use athors weibo user,password'))
                 try:
@@ -175,8 +192,6 @@ class Simu(Dbsave):
 
     def _detail(self, url=None):
         if url:
-            LOG.info(_('get all weibo info from %(url)s'),
-                     {'url': url})
             return self.get_content(url)
         else:
             LOG.exception(_('Not Found url'))

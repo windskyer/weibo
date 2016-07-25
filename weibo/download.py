@@ -101,7 +101,7 @@ class ImageDl(Download):
             self.uids.append(value.uid)
 
     def get_all_img_urls(self, uid):
-        LOG.info(_('Get all img url from wbimg table'))
+        LOG.debug(_('Get all img url from wbimg table'))
         urls = []
         if db_api.is_wbimg_get_by_uid(uid):
             imgs = db_api.db_wbimg_get_by_uid(uid)
@@ -113,7 +113,7 @@ class ImageDl(Download):
         return urls
 
     def get_all_zfimg_urls(self, uid):
-        LOG.info(_('Get all img url from zfwbimg table'))
+        LOG.debug(_('Get all img url from zfwbimg table'))
         urls = []
         if db_api.is_zfwbimg_get_by_uid(uid):
             zfimgs = db_api.db_zfwbimg_get_by_uid(uid)

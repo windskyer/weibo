@@ -313,11 +313,14 @@ class JDetail(object):
         return attrs.get('src', None)
 
     # 查询下一个 子 的 div
-    def _get_wb_img_or_videos(self, jx=None):
+    def _get_wb_img_or_videos(self, jx=None, zf=False):
         if not jx:
             jx = self.jx
-        div_attrs = {'class': 'WB_media_wrap clearfix',
-                     'node-type': 'feed_list_media_prev'}
+        if zf:
+            div_attrs = {'class': 'WB_media_wrap clearfix'}
+        else:
+            div_attrs = {'class': 'WB_media_wrap clearfix',
+                         'node-type': 'feed_list_media_prev'}
         # find first img div
         try:
             img_videos_div = self._get_children_tag(jx=jx,
@@ -332,7 +335,7 @@ class JDetail(object):
         if not jx:
             jx = self.jx
         img_urls = {'is_zf': zf}
-        i_v_div = self._get_wb_img_or_videos(jx)
+        i_v_div = self._get_wb_img_or_videos(jx, zf)
         if not i_v_div:
             urls = None
         else:
