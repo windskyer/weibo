@@ -218,7 +218,7 @@ def main():
         service_started = True
 
     if not service_started:
-        msg = _('No volume service(s) started successfully, terminating.')
+        msg = _('No weibo service(s) started successfully, terminating.')
         LOG.error(msg)
         sys.exit(1)
 
