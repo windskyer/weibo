@@ -1,5 +1,6 @@
 # --*-- coding: utf-8 --*--
 import os
+import time
 import functools
 import eventlet
 
@@ -77,6 +78,12 @@ class Wbmanager(manager.Manager):
                 os._exit(2)
 
             LOG.debug(_LI('Started child %d' % pid))
+
+    def init_host(self, tg, **kwargs):
+        LOG.info(_LI('Willing init  host function.......'))
+        if tg:
+            kwargs['tg'] = tg
+        self.get_all_user_all_weibo_info(**kwargs)
 
     # 设置周期任务 14400s  每天更新4次
     @periodic_task.periodic_task(spacing=CONF.userdata_interval)

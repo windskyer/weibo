@@ -3,6 +3,7 @@
 
 import os
 import six
+import time
 import eventlet
 
 from weibo import exception
@@ -135,6 +136,7 @@ class Simu(Dbsave):
         if isinstance(url, list):
             for u in url:
                 if not is_db or not nickname:
+                    time.sleep(20)
                     nickname = self.get_nickname(u)
 
                 self.weibodata[nickname] = self._detail(u)
