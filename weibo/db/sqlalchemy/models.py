@@ -36,14 +36,9 @@ class WeiboBase(object):
         if not session:
             session = get_session()
 
-        session.add(self)
-        try:
+        with session.begin(subtransactions=True):
+            session.add(self)
             session.flush()
-        except IntegrityError, e:
-            if str(e).endswith('is not unique'):
-                raise exception.Duplicate(str(e))
-            else:
-                raise
 
     def delete(self, session=None):
         """Delete this object."""

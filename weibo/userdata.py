@@ -21,10 +21,8 @@ class Userdata(db_api.Dbsave):
         self.api_key = CONF.api_key
 
         self.nicknames = []
-        self.removenames = []
         self.get_userapi()
         self.get_all_names()
-        self.get_remove_names()
 
     def get_userapi(self, rm=False):
         if isinstance(self.api_key, list) and self.api_num < len(self.api_key):
@@ -47,18 +45,14 @@ class Userdata(db_api.Dbsave):
             if nickname:
                 self.nicknames.append(nickname)
 
-    def get_remove_names(self):
+    def remove_userdata(self):
         udatas = self.db_userdata_get_all()
         for udata in udatas:
             nickname = udata.screen_name
             if isinstance(nickname, unicode):
                 nickname = nickname.encode('utf-8')
             if nickname not in self.nicknames:
-                self.removenames.append(udata.screen_name)
-
-    def delete_from_name(self):
-        for name in self.removenames:
-            self.db_userdata_delete_name(name)
+                udata.delete()
 
     def call(self, url=None, **kwargs):
         try:
@@ -129,8 +123,7 @@ class Userdata(db_api.Dbsave):
             self.db_userdata_create_or_update(values)
 
     def save_all_users(self):
-        self.get_remove_names()
-        self.delete_from_name()
+        self.remove_userdata()
         if isinstance(self.nicknames, list):
             for nickname in self.nicknames:
                 self.save_one_user(nickname)

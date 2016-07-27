@@ -251,5 +251,14 @@ class ServiceTopicExists(WeiboError):
 class ResetLoginError(WeiboError):
     msg_fmt = _("Weibo not reset login")
 
+
+class WeiboEnd(WeiboError):
+    msg_fmt = _("All page update info to db finish")
+
+
 class NotDescription(WeiboError):
     msg_fmt = _("Weibo not found descrption info")
+
+
+class DetailEmptyFound(WeiboError):
+    msg_fmt = _("Weibo info is empty")
