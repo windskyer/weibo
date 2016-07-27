@@ -4,6 +4,7 @@
 import os
 import six
 import time
+import functools
 import eventlet
 
 from weibo import exception
@@ -12,10 +13,33 @@ from weibo.login import Login
 from weibo.jhtml import Jhtml
 from weibo.common import cfg
 from weibo.common import log as logging
-from weibo.common.gettextutils import _
+from weibo.common.gettextutils import _, _LI
 
 CONF = cfg.CONF
 LOG = logging.getLogger(__name__)
+
+
+def wrap_time_exec(*args, **kwargs):
+    ntime = kwargs.get('ntime', 10)
+    if not ntime:
+        ntime = 10
+
+    def outer(f):
+        @functools.wraps(f)
+        def inner(self, *args, **kw):
+            f.ntime = ntime
+            n = 1
+            while n <= f.ntime:
+                LOG.debug(_LI('Execing %s time fucntin %s' % (n, f.__name__)))
+                if n == f.ntime:
+                    return f(self, *args, **kw)
+                try:
+                    return f(self, *args, **kw)
+                except Exception:
+                    n = n + 1
+                    eventlet.greenthread.sleep(60)
+        return inner
+    return outer
 
 
 class Simu(Dbsave):
@@ -167,6 +191,19 @@ class Simu(Dbsave):
             self.save_all_data(weibodata)
 
     # 使用多线成对一个 大号处理
+    @wrap_time_exec(ntime=CONF.ntime)
+    def _eventlet_one_url(self, url, nickname):
+        try:
+            weibodata = self.detail(url, True, nickname)
+            eventlet.greenthread.sleep(20)
+        except exception.DetailNotFound:
+            LOG.warn(_('reset login weibo use athors weibo user,password'))
+            try:
+                self.reset_login(nickname)
+            except:
+                raise exception.ResetLoginError()
+        return weibodata
+
     def eventlet_one_url(self, url, nickname):
         if nickname not in self.exist_weibodata:
             LOG.info(_("updating %(nickname)s from %(url)s"),
@@ -175,14 +212,9 @@ class Simu(Dbsave):
                      )
             self.exist_weibodata.append(nickname)
             try:
-                weibodata = self.detail(url, True, nickname)
-                eventlet.greenthread.sleep(20)
-            except exception.DetailNotFound:
-                LOG.warn(_('reset login weibo use athors weibo user,password'))
-                try:
-                    self.reset_login(nickname)
-                except:
-                    raise exception.ResetLoginError()
+                weibodata = self._eventlet_one_url(url, nickname)
+            except exception.ResetLoginError:
+                raise
             else:
                 self.exist_weibodata.remove(nickname)
                 self.save_all_data(weibodata)
