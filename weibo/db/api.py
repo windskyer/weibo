@@ -259,6 +259,10 @@ class Dbsave(object):
             return False
         return True
 
+    # get url from zfwbimg db
+    def db_zfwbimg_get_by_url(self, url):
+        return api.zfwbimg_get_by_url(url)
+
     #  ----- option all zfwbimg end ----- #
     # save all data to db
     def save_all_data(self):
