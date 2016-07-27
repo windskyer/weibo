@@ -1,6 +1,5 @@
 # --*-- coding: utf-8 --*--
 import os
-import time
 import functools
 import eventlet
 
@@ -79,22 +78,16 @@ class Wbmanager(manager.Manager):
 
             LOG.debug(_LI('Started child %d' % pid))
 
-    def init_host(self, tg, **kwargs):
-        LOG.info(_LI('Willing init  host function.......'))
-        if tg:
-            kwargs['tg'] = tg
-        self.get_all_user_all_weibo_info(**kwargs)
-
     # 设置周期任务 14400s  每天更新4次
     @periodic_task.periodic_task(spacing=CONF.userdata_interval)
     def update_userdata_info(self, **kwargs):
-        LOG.info(_LI('update userdata info to db'))
+        LOG.info(_LI('Looping exec function update_userdata_info'))
         self.udata.save_all_users()
 
     # 设置微博每 10 分钟更新 一次
     @periodic_task.periodic_task(spacing=CONF.download_interval)
     def download_all_img(self, **kwargs):
-        LOG.info(_LI('download all img to db'))
+        LOG.info(_LI('Looping exec function download_all_img'))
         self.imagedl.download()
 
     @property
@@ -107,12 +100,18 @@ class Wbmanager(manager.Manager):
         try:
             self.simulogin.eventlet_one_url(url, name)
         except exception.ResetLoginError:
+            LOG.debug(_LI('reset login  %(nickname)s weibo'),
+                      {'nickname': name})
             self.reset_login_weibo
             eventlet.greenthread.sleep(10)
+        except Exception:
+            eventlet.greenthread.sleep(20)
 
     @periodic_task.periodic_task(spacing=CONF.weiboinfo_interval)
     def update_webo_info(self, **kwargs):
+        LOG.info(_LI('Looping exec function update_webo_info'))
         udata = self.simulogin.get_db_userdata_all()
+        initial_delay = 0
         for u in udata:
             nickname = u.get('screen_name', None)
             if nickname in self.exist_udata_name:
@@ -127,11 +126,16 @@ class Wbmanager(manager.Manager):
                 return
             LOG.info(_LI('update %(nickname)s weibo info to db'),
                      {'nickname': nickname})
-            tg.add_timer(300, self.update_one_weibo, 3, url, nickname)
+            tg.add_timer(CONF.weiboinfo_interval,
+                         self.update_one_weibo,
+                         initial_delay * 10,
+                         url, nickname)
+            initial_delay = initial_delay + 1
 
     # 获取所有的用户的所有微博信息
     @periodic_task.periodic_task
     def get_all_user_all_weibo_info(self, *args, **kwargs):
+        LOG.info(_LI('Looping exec function get_all_user_all_weibo_info'))
         if self.is_all_and_runing:
             return
         else:

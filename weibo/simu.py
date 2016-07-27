@@ -178,7 +178,7 @@ class Simu(Dbsave):
                 weibodata = self.detail(url, True, nickname)
                 eventlet.greenthread.sleep(20)
             except exception.DetailNotFound:
-                LOG.error(_('reset login weibo use athors weibo user,password'))
+                LOG.warn(_('reset login weibo use athors weibo user,password'))
                 try:
                     self.reset_login(nickname)
                 except:
