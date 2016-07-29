@@ -30,6 +30,18 @@ TIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 PERFECT_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
 
 
+def convert_dt(sdatetime):
+    sdtime = sdatetime.split()
+    week = sdtime[0]
+    timezone = sdtime.pop(-2)
+    ttt = datetime.datetime.strptime(" ".join(sdtime[1:]),
+                                     "%b %d %H:%M:%S %Y")
+    d8 = datetime.timedelta(hours=8)
+    d = datetime.timedelta(hours=int(timezone)/100)
+    ttt = ttt+(d-d8)
+    return ttt
+
+
 def isotime(at=None):
     """Stringify time in ISO 8601 format"""
     if not at:

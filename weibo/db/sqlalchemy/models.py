@@ -122,7 +122,7 @@ class Userdata(BASE, WeiboBase):
     credit_score = Column(Integer, default=0)
 
     # 注册时间
-    created_at = Column(String(150))
+    created_at = Column(DateTime)
 
     # 主页地址
     profile_url = Column(String(150))

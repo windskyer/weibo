@@ -8,6 +8,7 @@ from weibo.db import api as db_api
 from weibo.common import cfg
 from weibo.common.gettextutils import _
 from weibo.common import log as logging
+from weibo.common import timeutils
 
 CONF = cfg.CONF
 LOG = logging.getLogger(__name__)
@@ -95,7 +96,7 @@ class Userdata(db_api.Dbsave):
         values['gender'] = ushow.get('gender')
         values['urank'] = ushow.get('urank')
         values['credit_score'] = ushow.get('credit_score')
-        values['created_at'] = ushow.get('created_at')
+        values['created_at'] = timeutils.convert_dt(ushow.get('created_at'))
         values['profile_url'] = ushow.get('profile_url')
         values['homepage'] = self.set_homepage(ushow.get('profile_url'))
         # values['verified_reason'] = ushow.get('verified_reason')
