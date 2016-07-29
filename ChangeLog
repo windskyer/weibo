@@ -1,10 +1,46 @@
 CHANGES
 =======
 
+* add new column
+* alter created_at datetime
+* add eventlet on process
+* add remove userdata info
+* Fix bug
+
+2016.7.10
+---------
+
+* add same bug
+* add all page to db
+* add get all page info weibo
+* add get all page info weibo
+* add all weibo info to db
+
+2016.6.28
+---------
+
+* add person info
+* add more userdata info
+
+2016.6.27
+---------
+
+* add save_file
+* add image_url userdata
+* add cookie file
+
+2016.6.26
+---------
+
+* add change more info
 * change cookie file
 * add more info
 * add weibo startup script
 * add weibo startup script
+
+2016.6.25
+---------
+
 * add image download to local disk
 * task 5
 * add log info  and open url
