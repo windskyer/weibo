@@ -39,7 +39,7 @@ class Userdata(db_api.Dbsave):
         if 'users' in userdict:
             for user in userdict['users']:
                 nickname = user.get('nickname')
-                delete = eval(user.get('delete'))
+                delete = eval(user.get('delete', delete))
                 if delete:
                     self.remove_userdate_by_name(nickname)
                 if nickname and not delete:
