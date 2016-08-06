@@ -174,6 +174,7 @@ class Weibo(BASE, WeiboBase):
 
     # 发布时间
     time_at = Column(String(150))
+    datetime_at = Column(DateTime)
 
     # 发布来源
     source = Column(String(150))
@@ -193,6 +194,9 @@ class Zfwbimg(BASE, WeiboBase):
 
     # img 的 url 地址
     url = Column(String(200))
+
+    # big img 的 url 地址
+    bigurl = Column(String(200))
 
     # 是否是转发微博
     is_zf = Column(Boolean, default=False)
@@ -215,6 +219,9 @@ class Wbimg(BASE, WeiboBase):
 
     # img 的 url 地址
     url = Column(String(200))
+
+    # big img 的 url 地址
+    bigurl = Column(String(200))
 
     # 是否是转发微博
     is_zf = Column(Boolean, default=False)

@@ -1,6 +1,7 @@
 # --*-- coding: utf-8 --*--
 import urlparse
 
+from weibo import utils
 from weibo import version
 from weibo import exception
 from weibo.api import api
@@ -13,6 +14,8 @@ from weibo.common import timeutils
 CONF = cfg.CONF
 LOG = logging.getLogger(__name__)
 
+_CACHED_JSON = {}
+
 
 class Userdata(db_api.Dbsave):
     def __init__(self, ts=None):
@@ -23,7 +26,24 @@ class Userdata(db_api.Dbsave):
 
         self.nicknames = []
         self.get_userapi()
-        self.get_all_names()
+        self.get_all_names_json()
+
+    def get_users_from_json(self, filename=None):
+        self.nicknames = []
+        if not filename:
+            filename = CONF.user_json
+        return utils.read_cached_file(filename, _CACHED_JSON)
+
+    def get_all_names_json(self, delete=False):
+        userdict = self.get_users_from_json()
+        if 'users' in userdict:
+            for user in userdict['users']:
+                nickname = user.get('nickname')
+                delete = eval(user.get('delete'))
+                if delete:
+                    self.remove_userdate_by_name(nickname)
+                if nickname and not delete:
+                    self.nicknames.append(nickname)
 
     def get_userapi(self, rm=False):
         if isinstance(self.api_key, list) and self.api_num < len(self.api_key):
@@ -46,6 +66,12 @@ class Userdata(db_api.Dbsave):
             if nickname:
                 self.nicknames.append(nickname)
 
+    def remove_userdate_by_name(self, nickname):
+        try:
+            self.db_userdata_delete_name(nickname)
+        except exception.UserdataNameNotFound:
+            pass
+
     def remove_userdata(self):
         udatas = self.db_userdata_get_all()
         for udata in udatas:
@@ -53,6 +79,7 @@ class Userdata(db_api.Dbsave):
             if isinstance(nickname, unicode):
                 nickname = nickname.encode('utf-8')
             if nickname not in self.nicknames:
+                LOG.debug('Deleted nickname %s' % nickname)
                 udata.delete()
 
     def call(self, url=None, **kwargs):
@@ -124,7 +151,7 @@ class Userdata(db_api.Dbsave):
             self.db_userdata_create_or_update(values)
 
     def save_all_users(self):
-        self.remove_userdata()
+        # self.remove_userdata()
         if isinstance(self.nicknames, list):
             for nickname in self.nicknames:
                 self.save_one_user(nickname)

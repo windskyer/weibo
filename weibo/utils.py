@@ -1,12 +1,71 @@
+import os
 import sys
+import time
+import urlparse
+import urllib2
 from eventlet import event
 from eventlet.green import subprocess
 from eventlet import greenthread
 
+from weibo import exception
 from weibo.common.gettextutils import _
+from weibo.common import jsonutils
 from weibo.common import log as logging
 
 LOG = logging.getLogger(__name__)
+
+
+def conn_img_url(bigurl, ntime=3):
+    while ntime > 0:
+        try:
+            time.sleep(3)
+            urllib2.urlopen(bigurl)
+        except Exception:
+            ntime = ntime - 1
+        else:
+            break
+
+    if ntime < 1:
+        raise exception.ConnNotUrl(url=bigurl)
+
+
+def exists_big_img(url):
+    jxurl = urlparse.urlparse(url)
+    path = jxurl.path
+    netloc = jxurl.netloc
+    dirname, filename = os.path.split(path)
+    baseurl = jxurl.scheme + '://' + netloc
+    if 'sinaimg' in netloc:
+        dirname = '/mw690'
+        path = dirname + '/' + filename
+        bigurl = urlparse.urljoin(baseurl, path)
+        try:
+            conn_img_url(bigurl)
+        except exception.ConnNotUrl:
+            return
+    else:
+        return bigurl
+
+
+def read_cached_file(filename, cache_info, reload_func=None):
+    """Read from a file if it has been modified.
+
+    :param cache_info: dictionary to hold opaque cache.
+    :param reload_func: optional function to be called with data when
+                        file is reloaded due to a modification.
+
+    :returns: data from file
+
+    """
+    mtime = os.path.getmtime(filename)
+    if not cache_info or mtime != cache_info.get('mtime'):
+        LOG.debug(_("Reloading cached file %s") % filename)
+        with open(filename) as fap:
+            cache_info['data'] = fap.read()
+        cache_info['mtime'] = mtime
+        if reload_func:
+            reload_func(cache_info['data'])
+    return jsonutils.loads(cache_info['data'])
 
 
 def to_bytes(s):

@@ -30,9 +30,18 @@ TIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 PERFECT_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
 
 
+def timestamp2datetime(timestamp, convert_to_local=True):
+    ''' Converts UNIX timestamp to a datetime object. '''
+    if isinstance(timestamp, (int, long, float)):
+        dt = datetime.datetime.utcfromtimestamp(timestamp)
+        if convert_to_local:
+            dt = dt + datetime.timedelta(hours=8)
+            return dt
+        return timestamp
+
+
 def convert_dt(sdatetime):
     sdtime = sdatetime.split()
-    week = sdtime[0]
     timezone = sdtime.pop(-2)
     ttt = datetime.datetime.strptime(" ".join(sdtime[1:]),
                                      "%b %d %H:%M:%S %Y")
@@ -95,6 +104,11 @@ def utcnow():
     if utcnow.override_time:
         return utcnow.override_time
     return datetime.datetime.utcnow()
+
+
+def iso8601_from_timestamp(timestamp):
+    """Returns a iso8601 formated date from timestamp."""
+    return isotime(datetime.datetime.utcfromtimestamp(timestamp))
 
 
 utcnow.override_time = None

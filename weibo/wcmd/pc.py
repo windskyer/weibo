@@ -134,9 +134,7 @@ def login():
         simulogin.detail()
     except exception.DetailNotFound:
         simu.Simu.reset_login()
-        simulogin = simu.Simu()
         simulogin.detail()
-    simulogin.save_all_data()
 
 
 def pweibo():

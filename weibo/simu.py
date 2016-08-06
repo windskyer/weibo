@@ -6,13 +6,17 @@ import six
 import time
 import functools
 import eventlet
+import urllib2
+import urlparse
 
+from weibo import utils
 from weibo import exception
 from weibo.db.api import Dbsave
 from weibo.login import Login
 from weibo.jhtml import Jhtml
 from weibo.common import cfg
 from weibo.common import log as logging
+from weibo.common import timeutils
 from weibo.common.gettextutils import _, _LI
 
 CONF = cfg.CONF
@@ -64,6 +68,7 @@ class Simu(Dbsave):
         self.login = Login(self.username, self.password)
         self.jhtml = Jhtml()
         self.exist_weibodata = []
+        self.weibopc_exist_exec = []
 
     @property
     def get_urls_name(self):
@@ -125,6 +130,8 @@ class Simu(Dbsave):
         if not os.path.exists(cls.cookie_file):
             LOG.info("weibo login is reset")
             cls.pre_weibo_login()
+        else:
+            cls.pre_weibo_login()
         return 0
 
     @classmethod
@@ -159,13 +166,20 @@ class Simu(Dbsave):
 
         if isinstance(url, list):
             for u in url:
+                save_weibodata = {}
                 if not is_db or not nickname:
                     time.sleep(20)
                     nickname = self.get_nickname(u)
+                    if nickname in self.weibopc_exist_exec:
+                        continue
 
                 self.weibodata[nickname] = self._detail(u)
+                save_weibodata[nickname] = self.weibodata[nickname]
                 LOG.info(_('Get %(nickname)s user weibo info url is %(url)s'),
                          {'nickname': nickname, 'url': u})
+                if not is_db or not nickname:
+                    self.weibopc_exist_exec.append(nickname)
+                    self.save_all_data(save_weibodata)
 
         weibodata = self.weibodata
         return weibodata
@@ -253,6 +267,9 @@ class Simu(Dbsave):
         time_at = weibodata.get('time_at', None)
         values.setdefault('time_at', time_at)
 
+        datetime_at = timeutils.timestamp2datetime(time_at)
+        values.setdefault('datetime_at', datetime_at)
+
         return values
 
     def get_wbtext_data(self, weibodata, iszf=False):
@@ -329,6 +346,23 @@ class Simu(Dbsave):
         if zf_wb:
             self.save_zfwbtext(zf_wb)
 
+    def exists_big_img(self, url):
+        jxurl = urlparse.urlparse(url)
+        path = jxurl.path
+        netloc = jxurl.netloc
+        dirname, filename = os.path.split(path)
+        baseurl = jxurl.scheme + '://' + netloc
+        if 'sinaimg' in netloc:
+            dirname = '/mw690'
+            path = dirname + '/' + filename
+            bigurl = urlparse.urljoin(baseurl, path)
+            try:
+                urllib2.urlopen(bigurl)
+            except Exception:
+                return
+            else:
+                return bigurl
+
     def save_zfwbimg(self, zf_wb=None, iszf=True):
         zf_wbimg = self.get_wbimg_data(zf_wb, iszf)
         if 'urls' in zf_wbimg.keys():
@@ -336,6 +370,9 @@ class Simu(Dbsave):
             if urls:
                 for url in urls:
                     zf_wbimg['url'] = url
+                    bigurl = utils.exists_big_img(url)
+                    if bigurl:
+                        zf_wbimg['bigurl'] = bigurl
                     self.db_zfwbimg_create_or_update(zf_wbimg)
 
     def save_wbimg(self, weibodata=None):
@@ -345,6 +382,9 @@ class Simu(Dbsave):
             if urls:
                 for url in urls:
                     wbimg['url'] = url
+                    bigurl = self.exists_big_img(url)
+                    if bigurl:
+                        wbimg['bigurl'] = bigurl
                     self.db_wbimg_create_or_update(wbimg)
 
         zf_wb = self.get_zf_wb(weibodata)

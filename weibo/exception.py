@@ -262,3 +262,7 @@ class NotDescription(WeiboError):
 
 class DetailEmptyFound(WeiboError):
     msg_fmt = _("Weibo info is empty")
+
+
+class ConnNotUrl(WeiboError):
+    msg_fmt = _("Connection weibo url %(url)s address")

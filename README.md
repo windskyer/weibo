@@ -123,3 +123,11 @@ cp etc/weibo.service /usr/lib/systemd/system/
 systemctl enable weibo.service
 systemctl start weibo.service
 ```
+
+
+
+全新安装与介绍
+===
+```
+```
+

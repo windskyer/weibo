@@ -82,6 +82,7 @@ class Wbmanager(manager.Manager):
     @periodic_task.periodic_task(spacing=CONF.userdata_interval)
     def update_userdata_info(self, **kwargs):
         LOG.info(_LI('Looping exec function update_userdata_info'))
+        self.udata.get_all_names_json()
         self.udata.save_all_users()
 
     # 设置微博每 10 分钟更新 一次

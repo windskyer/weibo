@@ -93,21 +93,21 @@ def userdata_delete(id):
     session = get_session()
     userdata = userdata_get_by_id(id, session)
     if userdata:
-        userdata.delete()
+        userdata.delete(session)
 
 
 def userdata_delete_uid(uid):
     session = get_session()
     userdata = userdata_get_by_uid(uid, session)
     if userdata:
-        userdata.delete()
+        userdata.delete(session)
 
 
 def userdata_delete_name(name):
     session = get_session()
     userdata = userdata_get_by_name(name, session)
     if userdata:
-        userdata.delete()
+        userdata.delete(session)
 
 
 def userdata_get_by_name(name, session=None):
@@ -619,7 +619,7 @@ def zfwbtext_delete(id, session=None):
 
     zfwbtexts = zfwbtext_get_by_id(id)
     for zfwbtext in zfwbtexts:
-        zfwbtext.delete()
+        zfwbtext.delete(session)
 
 
 def zfwbtext_delete_mid(mid, session=None):
@@ -628,7 +628,7 @@ def zfwbtext_delete_mid(mid, session=None):
 
     zfwbtext = zfwbtext_get_by_mid(mid)
     if zfwbtext:
-        zfwbtext.delete()
+        zfwbtext.delete(session)
 
 
 def zfwbtext_delete_uid(uid, session=None):
@@ -637,7 +637,7 @@ def zfwbtext_delete_uid(uid, session=None):
 
     zfwbtexts = zfwbtext_get_by_uid(uid)
     for zfwbtext in zfwbtexts:
-        zfwbtext.delete()
+        zfwbtext.delete(session)
 
 
 def zfwbtext_get_by_id(id, session=None):

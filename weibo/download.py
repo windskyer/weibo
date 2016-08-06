@@ -8,6 +8,7 @@ import os
 import urllib2
 import urlparse
 
+from weibo import utils
 from weibo import exception
 from weibo.common import cfg
 from weibo.common import log as logging
@@ -70,6 +71,7 @@ class Download(object):
         return imgfile
 
     def save_img(self, conn, imgfile):
+        LOG.debug(_('Saving imgfile to %s' % imgfile))
         with open(imgfile, 'wb') as fp:
             fp.write(conn.read())
 
@@ -153,8 +155,10 @@ class ImageDl(Download):
                         self.update_to_db(url, imgfile, True)
                     if k == 'wb':
                         self.update_to_db(url, imgfile, False)
+                    LOG.debug(_('img file  %s is exists' % imgfile))
                     continue
                 try:
+                    LOG.debug(_('Downloading img url %s' % url))
                     conn = self.get_img(url)
                 except exception.NotFoundImg:
                     continue
@@ -170,6 +174,10 @@ class ImageDl(Download):
             img = db_api.db_wbimg_get_by_url(url)
         else:
             img = db_api.db_zfwbimg_get_by_url(url)
+        bigurl = utils.exists_big_img(url)
+        if bigurl and img.bigurl is None:
+            LOG.info(_('Updating bigurl to wbimg, zfwbimg'))
+            img.bigurl = bigurl
         img.location = location
         img.save()
 

@@ -75,8 +75,7 @@ class Dbsave(object):
 
     # delete userdata by name
     def db_userdata_delete_name(self, name):
-        if self.is_userdata_get_by_name(name):
-            api.userdata_delete_name(name)
+        api.userdata_delete_name(name)
 
     # weibo create
     def db_weibo_create(self, values):
