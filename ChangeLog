@@ -1,6 +1,10 @@
 CHANGES
 =======
 
+* fix bug
+* add user json, alter create weibo time
+* add user json, alter create weibo time
+* chanage log info
 * add new column
 * alter created_at datetime
 * add eventlet on process
