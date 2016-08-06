@@ -43,8 +43,8 @@ def exists_big_img(url):
             conn_img_url(bigurl)
         except exception.ConnNotUrl:
             return
-    else:
-        return bigurl
+        else:
+            return bigurl
 
 
 def read_cached_file(filename, cache_info, reload_func=None):
