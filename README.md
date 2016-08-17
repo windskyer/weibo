@@ -127,9 +127,10 @@ systemctl start weibo.service
 
 
 全新安装与介绍
+==
+数据库表结构介绍
 ===
 ```
-数据库表结构介绍
 userdata 表
     # 用户id
     uid = Column(BigInteger)
@@ -300,4 +301,55 @@ wbimg（微博 图片地址）
     # 被转发weibo 的mid
     pa_mid = Column(BigInteger, nullable=True)
 ```
+安装方法
+===
+```
+1, 下载
+git clone https://github.com/windskyer/weibo.git
+或者
+wget -c https://github.com/windskyer/weibo/archive/2016.7.11.tar.gz (选择合适版本)
+
+2， 安装
+cd weibo
+pip install -r requirements.txt   (如果出错  打开 requirements.txt 文件查看解决方法)
+python setup.py install
+
+3, 修改配置文件
+安装完成后  在 /etc/weibo/weibo.conf 配置中做修改(根据需要自行修改过)
+设置 配置文件中的sql 地址
+[database]
+sql_connection = mysql://weibo:weibo@192.168.122.206/weibo?charset=utf8
+
+安装完成后  在 /etc/weibo/user.json 文件中 设置 需要爬虫的 weibo 大号
+{
+        "nickname": "延参法师",
+        "url": "",
+        "delete": "False"
+ },
+ 文件以一个 dict 为单位  如上  添加 延参法师 的微博
+ 注意： 设置 delete 为 True 时候  表示 是 不在爬虫这个 微博大号 默认是 False
+ 修改 user.json  不需重启服务， 动态添加和删除微博大号
+ 
+ 
+ 4，同步数据库
+ 安装完成后， 和  配置修改过完成后.
+ create database weibo DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci; #创建数据库
+ weibodb   #同步数据库
+ 
+ 
+ 5， 运行服务
+ 
+ 安装完成后， 和  配置修改过完成后， 运行服务。
+ 运行服务有两种方式
+ 
+   一， 运行命令  weibo &>/dev/null &  开启微博服务。 
+   
+   二,  如果需要快速 更新数据库中数据则 运行如下命令
+         weiboapi   可以根据配置为weibo.conf 中的 enable_multitargets = t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t13, t12, t14, t15, t16, t17, t18, t19, t20  项 来快速更新 userdata 表中数据
+         
+         weibopc  开始更新 weibo 信息到数据。
+         
+         weibodn  开始下载 weibo 中的img 图片到本地
+
+
 
