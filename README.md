@@ -129,5 +129,175 @@ systemctl start weibo.service
 全新安装与介绍
 ===
 ```
+数据库表结构介绍
+userdata 表
+    # 用户id
+    uid = Column(BigInteger)
+    
+    # 昵称
+    screen_name = Column(String(64))
+    
+    # 友好名称
+    name = Column(String(32))
+    
+    # 用户所在地方
+    location = Column(String(64))
+    
+    # 简介
+    description = Column(String(200))
+    
+    # 关注数量
+    friends_count = Column(BigInteger)
+    
+    # 粉丝数量
+    followers_count = Column(BigInteger)
+    
+    # 标签
+    ability_tags = Column(String(15))
+    
+    # 性别
+    gender = Column(String(15), default='m')
+
+    # 等级
+    urank = Column(Integer, default=0)
+
+    # 阳光信用
+    credit_score = Column(Integer, default=0)
+
+    # 注册时间
+    created_at = Column(DateTime)
+    
+    # 主页地址
+    profile_url = Column(String(150))
+
+    # 微博主页地址
+    homepage = Column(String(150)) 
+
+    # 头像
+    profile_image_url = Column(String(150), default=None)
+
+    # 出生日期
+    birthdate = Column('birthdate', String(200))
+
+    # 认证原因
+    verified_reason = Column('verified_reason', String(200))
+
+    # 是否认证
+    verified = Column('verified', Boolean, default=False)
+
+    # 个人备注， 个性签名
+    remark = Column('remark', String(200))
+
+weibo 表（微博的描述信息）
+    # 微博id
+    mid = Column(BigInteger, nullable=False)
+    
+    # user id
+    uid = Column(BigInteger, nullable=False)
+    
+    # 转发数量
+    forward = Column(BigInteger)
+    
+    # 评论数量
+    repeat = Column(BigInteger)
+    
+    # 点赞数量
+    praised = Column(BigInteger)
+    
+    # 发布时间
+    time_at = Column(String(150))
+    datetime_at = Column(DateTime)
+    
+    # 发布来源
+    source = Column(String(150))
+
+zfwbimg(转发微博的 图片地址)
+    
+    # 微博mid
+    mid = Column(BigInteger, nullable=False)
+    
+    # 用户UID
+    uid = Column(BigInteger, nullable=False)
+    
+    # img所在地方
+    location = Column(String(200))
+    
+    # img 的 url 地址
+    url = Column(String(200))
+    
+    # big img 的 url 地址
+    bigurl = Column(String(200))
+    
+    # 是否是转发微博
+    is_zf = Column(Boolean, default=False)
+    
+    # 转发微博的mid
+    pa_mid = Column(BigInteger, nullable=True)
+
+wbimg（微博 图片地址）
+    # 微博mid
+    mid = Column(BigInteger, nullable=False)
+
+    # 用户UID
+    uid = Column(BigInteger, nullable=False)
+    
+    # img所在地方
+    location = Column(String(200))
+    
+    # img 的 url 地址
+    url = Column(String(200))
+    
+    # big img 的 url 地址
+    bigurl = Column(String(200))
+    
+    # 是否是转发微博
+    is_zf = Column(Boolean, default=False)
+    
+    # 被转发weibo 的mid
+    zf_mid = Column(BigInteger, nullable=True)
+    
+ wbtext 表  （微博的类容信息）
+    # 微博mid
+    mid = Column(BigInteger, nullable=False)
+    
+    # 用户UID
+    uid = Column(BigInteger, nullable=False)
+
+    # text info
+    text = Column(Text)
+    
+    # face 表情 info
+    face = Column(Text)
+    
+    # 文本中的link 的 url 地址
+    url = Column(Text)
+    
+    # 是否是转发微博
+    is_zf = Column(Boolean, default=False)
+    
+    # 转发weibo 的mid
+    zf_mid = Column(BigInteger, nullable=True)
+    
+ zfwbtext 表 （转发 微博的 类容信息）
+    # 微博mid
+    mid = Column(BigInteger, nullable=False)
+    
+    # 用户UID
+    uid = Column(BigInteger, nullable=False)
+
+    # text info
+    text = Column(Text)
+    
+    # face 表情 info
+    face = Column(Text)
+    
+    # 文本中的link 的 url 地址
+    url = Column(Text)
+    
+    # 是否是转发微博
+    is_zf = Column(Boolean, default=False)
+    
+    # 被转发weibo 的mid
+    pa_mid = Column(BigInteger, nullable=True)
 ```
 
